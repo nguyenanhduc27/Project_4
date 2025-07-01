@@ -91,7 +91,6 @@ class CustomHeader extends StatelessWidget {
                 Expanded(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-
                     children: [
                       TextButton(
                         onPressed: () {},
