@@ -6,7 +6,7 @@ class EmailVerificationScreen extends StatefulWidget {
   final String email;
 
   const EmailVerificationScreen({Key? key, required this.email})
-      : super(key: key);
+    : super(key: key);
 
   @override
   _EmailVerificationScreenState createState() =>
@@ -14,8 +14,10 @@ class EmailVerificationScreen extends StatefulWidget {
 }
 
 class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
-  final List<TextEditingController> _controllers =
-      List.generate(6, (_) => TextEditingController());
+  final List<TextEditingController> _controllers = List.generate(
+    6,
+    (_) => TextEditingController(),
+  );
   final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
   bool _isLoading = false;
 
@@ -26,11 +28,25 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     super.initState();
     for (int i = 0; i < _controllers.length; i++) {
       _controllers[i].addListener(() {
-        if (_controllers[i].text.length == 1 && i < _controllers.length - 1) {
+        final text = _controllers[i].text;
+        if (text.length > 1) {
+          _controllers[i].text = text.substring(0, 1); // chỉ lấy 1 ký tự
+          _controllers[i].selection = TextSelection.fromPosition(
+            TextPosition(offset: _controllers[i].text.length),
+          );
+        }
+
+        // Nếu nhập 1 ký tự, chuyển focus sang ô tiếp theo
+        if (text.length == 1 && i < _controllers.length - 1) {
           FocusScope.of(context).requestFocus(_focusNodes[i + 1]);
         }
-        // Rebuild to update button state
-        setState(() {});
+
+        // Nếu xoá ký tự và không ở ô đầu, chuyển về ô trước
+        if (text.isEmpty && i > 0) {
+          FocusScope.of(context).requestFocus(_focusNodes[i - 1]);
+        }
+
+        setState(() {}); // cập nhật trạng thái nút Xác minh
       });
     }
   }
@@ -47,15 +63,22 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   }
 
   void _verifyCode() async {
-    if (_verificationCode.length != 6) return;
+    if (_verificationCode.length != 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Vui lòng nhập đủ 6 số của mã xác minh')),
+      );
+      return;
+    }
 
     setState(() {
       _isLoading = true;
     });
 
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final success =
-        await authProvider.verifyLoginCode(widget.email, _verificationCode);
+    final success = await authProvider.verifyLoginCode(
+      widget.email,
+      _verificationCode,
+    );
 
     if (!mounted) return;
 
@@ -69,7 +92,8 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text('Mã xác minh không hợp lệ. Vui lòng thử lại.')),
+          content: Text('Mã xác minh không hợp lệ. Vui lòng thử lại.'),
+        ),
       );
     }
   }
@@ -126,7 +150,8 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                               TextSpan(
                                 text: widget.email,
                                 style: const TextStyle(
-                                    fontWeight: FontWeight.bold),
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                               const TextSpan(
                                 text: '. Vui lòng nhập mã này để tiếp tục.',
@@ -149,16 +174,18 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                                 maxLength: 1,
                                 readOnly: _isLoading,
                                 style: const TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold),
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                ),
                                 decoration: const InputDecoration(
                                   counterText: '',
                                   border: OutlineInputBorder(),
                                 ),
                                 onChanged: (value) {
                                   if (value.isEmpty && index > 0) {
-                                    FocusScope.of(context)
-                                        .requestFocus(_focusNodes[index - 1]);
+                                    FocusScope.of(
+                                      context,
+                                    ).requestFocus(_focusNodes[index - 1]);
                                   }
                                 },
                               ),
@@ -172,8 +199,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                             onPressed: isButtonEnabled ? _verifyCode : null,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF0071C2),
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 16),
+                              padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(4),
                               ),
@@ -184,23 +210,24 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                                     width: 24,
                                     child: CircularProgressIndicator(
                                       strokeWidth: 3,
-                                      valueColor:
-                                          AlwaysStoppedAnimation<Color>(
-                                              Colors.white),
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white,
+                                      ),
                                     ),
                                   )
                                 : const Text(
                                     "Xác minh email",
                                     style: TextStyle(
-                                        fontSize: 16, color: Colors.white),
+                                      fontSize: 16,
+                                      color: Colors.white,
+                                    ),
                                   ),
                           ),
                         ),
                         const SizedBox(height: 16),
                         const Text(
                           "Bạn chưa nhận được email? Vui lòng kiểm tra mục thư rác hoặc yêu cầu mã khác.",
-                          style: TextStyle(
-                              fontSize: 14, color: Colors.black54),
+                          style: TextStyle(fontSize: 14, color: Colors.black54),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 24),
