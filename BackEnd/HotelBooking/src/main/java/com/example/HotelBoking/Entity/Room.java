@@ -5,9 +5,7 @@ import lombok.*;
 
 @Entity
 @Table(name = "rooms")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+
 public class Room {
 
     @Id
@@ -30,4 +28,61 @@ public class Room {
     @JoinColumn(name = "hotel_id", insertable = false, updatable = false)
     private Hotel hotel;
 
+    public Room(){}
+
+    public Room(Long id, Long hotelId, Long roomTypeId, String roomNumber, Boolean isAvailable, Hotel hotel) {
+        this.id = id;
+        this.hotelId = hotelId;
+        this.roomTypeId = roomTypeId;
+        this.roomNumber = roomNumber;
+        this.isAvailable = isAvailable;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getHotelId() {
+        return hotelId;
+    }
+
+    public void setHotelId(Long hotelId) {
+        this.hotelId = hotelId;
+    }
+
+    public Long getRoomTypeId() {
+        return roomTypeId;
+    }
+
+    public void setRoomTypeId(Long roomTypeId) {
+        this.roomTypeId = roomTypeId;
+    }
+
+    public String getRoomNumber() {
+        return roomNumber;
+    }
+
+    public void setRoomNumber(String roomNumber) {
+        this.roomNumber = roomNumber;
+    }
+
+    public Boolean getAvailable() {
+        return isAvailable;
+    }
+
+    public void setAvailable(Boolean available) {
+        isAvailable = available;
+    }
+
+    public Hotel getHotel() {
+        return hotel;
+    }
+
+    public void setHotel(Hotel hotel) {
+        this.hotel = hotel;
+    }
 }

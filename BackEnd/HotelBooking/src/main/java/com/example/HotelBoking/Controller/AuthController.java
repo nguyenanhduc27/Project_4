@@ -16,6 +16,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,14 +44,11 @@ public class AuthController {
     @PostMapping("/login-request")
     public ResponseEntity<?> requestLogin(@RequestBody AuthRequest request) {
         System.out.println("Email đã nhập: " + request.getEmail());
-        System.out.println("Mật khẩu đã nhập: " + request.getPassword());
 
         try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-            );
-        } catch (BadCredentialsException e) {
-            return ResponseEntity.status(401).body("Tài khoản hoặc mật khẩu không đúng!");
+            UserDetails user = userDetailsService.loadUserByUsername(request.getEmail());
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.status(401).body("Không tìm thấy người dùng với email: " + request.getEmail());
         }
 
         String otp = otpService.generateOtp(request.getEmail());

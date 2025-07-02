@@ -17,9 +17,6 @@ public class UserService {
     @Autowired
     private UserRepository repo;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
     // Chuyển từ DTO sang Entity
     public User toEntity(UserDTO dto) {
         User u = new User();
