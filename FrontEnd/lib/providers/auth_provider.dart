@@ -26,29 +26,6 @@ class AuthProvider with ChangeNotifier {
     return success;
   }
 
-  Future<bool> register(
-    String fullName,
-    String email,
-    String password,
-    String phone,
-  ) async {
-    final success = await _authService.register(
-      fullName: fullName,
-      email: email,
-      password: password,
-      phone: phone,
-    );
-    _isAuthenticated = success;
-    notifyListeners();
-    return success;
-  }
-
-  Future<bool> loginWithPassword(String email, String password) async {
-    final success = await _authService.loginWithPassword(email, password);
-    _isAuthenticated = success;
-    notifyListeners();
-    return success;
-  }
 
   void logout() {
     _authService.logout();
