@@ -1,5 +1,6 @@
 package com.example.HotelBoking.DTO;
 
+import com.example.HotelBoking.Enum.Role;
 import lombok.*;
 
 
@@ -10,14 +11,17 @@ public class UserDTO {
     private String password;
     private String phone;
 
+    private Role role;
+
     public UserDTO(){}
 
-    public UserDTO(Long id, String fullName, String email, String password, String phone) {
+    public UserDTO(Long id, String fullName, String email, String password, String phone, Role role) {
         this.id = id;
         this.fullName = fullName;
         this.email = email;
         this.password = password;
         this.phone = phone;
+        this.role = role;
     }
 
     public String getPassword() {
@@ -58,5 +62,13 @@ public class UserDTO {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 }

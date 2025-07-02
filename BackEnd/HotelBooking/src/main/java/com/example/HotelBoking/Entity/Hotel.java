@@ -17,6 +17,7 @@ public class Hotel {
     private String name;
 
     private String address;
+    private String city;
 
     @Column(columnDefinition = "TEXT")
     private String description;
@@ -32,10 +33,11 @@ public class Hotel {
 
     public Hotel(){}
 
-    public Hotel(Long id, String name, String address, String description, Integer starRating, Long ownerId, LocalDateTime createdAt) {
+    public Hotel(Long id, String name, String address, String city, String description, Integer starRating, Long ownerId, LocalDateTime createdAt) {
         this.id = id;
         this.name = name;
         this.address = address;
+        this.city = city;
         this.description = description;
         this.starRating = starRating;
         this.ownerId = ownerId;
@@ -96,5 +98,13 @@ public class Hotel {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 }

@@ -2,8 +2,8 @@ package com.example.HotelBoking.Service;
 
 import com.example.HotelBoking.DTO.HotelDTO;
 import com.example.HotelBoking.Entity.Hotel;
-import com.example.HotelBoking.Repository.AdminRepository;
 import com.example.HotelBoking.Repository.HotelRepository;
+import com.example.HotelBoking.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +15,7 @@ public class HotelService {
     @Autowired
     private HotelRepository repo;
     @Autowired
-    private AdminRepository adminRepository;
+    private UserRepository userRepository;
 
 
     private HotelDTO toDTO(Hotel h) {
@@ -23,6 +23,7 @@ public class HotelService {
         dto.setId(h.getId());
         dto.setName(h.getName());
         dto.setAddress(h.getAddress());
+        dto.setCity(h.getCity());
         dto.setDescription(h.getDescription());
         dto.setStarRating(h.getStarRating());
         dto.setOwnerId(h.getOwnerId());
@@ -35,6 +36,7 @@ public class HotelService {
         h.setId(dto.getId());
         h.setName(dto.getName());
         h.setAddress(dto.getAddress());
+        h.setCity(dto.getCity());
         h.setDescription(dto.getDescription());
         h.setStarRating(dto.getStarRating());
         h.setOwnerId(dto.getOwnerId());
@@ -51,7 +53,7 @@ public class HotelService {
     }
 
     public Hotel add(HotelDTO dto) {
-        if (!adminRepository.existsById(dto.getOwnerId())) {
+        if (!userRepository.existsById(dto.getOwnerId())) {
             throw new RuntimeException("Owner ID không tồn tại!");
         }
         Hotel h = toEntity(dto);

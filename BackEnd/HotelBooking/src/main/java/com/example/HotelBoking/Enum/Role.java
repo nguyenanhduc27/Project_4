@@ -1,4 +1,6 @@
 package com.example.HotelBoking.Enum;
 
-public class Role {
+public enum Role {
+    User,
+    Admin
 }

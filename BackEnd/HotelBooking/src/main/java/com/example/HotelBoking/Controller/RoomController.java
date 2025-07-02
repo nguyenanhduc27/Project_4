@@ -45,10 +45,4 @@ public class RoomController {
     public String deleteRoom(@PathVariable Long id) {
         return service.delete(id) ? "Success Delete" : "Can not find id";
     }
-
-    @GetMapping("/hotels/{hotelId}/rooms")
-    public ResponseEntity<List<Room>> getRoomsByHotel(@PathVariable Long hotelId) {
-        List<Room> rooms = service.getRoomsByHotelId(hotelId);
-        return ResponseEntity.ok(rooms);
-    }
 }
