@@ -25,7 +25,7 @@ import com.example.HotelBoking.Entity.User;
 
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/login")
 public class AuthController {
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -39,29 +39,27 @@ public class AuthController {
     @Autowired private OtpService otpService;
     @Autowired private EmailService emailService;
 
-    // Bước 1: Xác thực tài khoản và gửi OTP
-    @PostMapping("/login-request")
+    // Bước 1: Gửi OTP đến email nếu tài khoản tồn tại
+    @PostMapping("/request-code")
     public ResponseEntity<?> requestLogin(@RequestBody AuthRequest request) {
         System.out.println("Email đã nhập: " + request.getEmail());
-        System.out.println("Mật khẩu đã nhập: " + request.getPassword());
 
-        try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-            );
-        } catch (BadCredentialsException e) {
-            return ResponseEntity.status(401).body("Tài khoản hoặc mật khẩu không đúng!");
-        }
+        // Kiểm tra email có tồn tại trong hệ thống không (nếu muốn)
+        // UserDetails user = userDetailsService.loadUserByUsername(request.getEmail());
+        // if (user == null) return ResponseEntity.status(404).body("Email không tồn tại!");
 
         String otp = otpService.generateOtp(request.getEmail());
-        emailService.sendOtp(request.getEmail(), otp);
-
+        try {
+            emailService.sendOtp(request.getEmail(), otp);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Lỗi gửi email: " + e.getMessage());
+        }
         return ResponseEntity.ok("Mã OTP đã được gửi đến email.");
     }
 
 
     // Bước 2: Xác thực OTP và trả token
-    @PostMapping("/verify-otp")
+    @PostMapping("/verify-code")
     public ResponseEntity<?> verifyOtp(@RequestBody OtpRequest request) {
         if (!otpService.verifyOtp(request.getEmail(), request.getOtp())) {
             return ResponseEntity.status(401).body("OTP không đúng hoặc đã hết hạn");
