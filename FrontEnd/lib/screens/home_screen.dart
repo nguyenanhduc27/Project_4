@@ -5,6 +5,8 @@ import '../widgets/custom_footer.dart';
 import '../widgets/search_bar_widget.dart';
 import '../widgets/room_card.dart';
 import '../models/room.dart';
+import 'all_room_pages.dart';
+import 'room_search_page.dart';
 
 class HotelBookingPage extends StatelessWidget {
   const HotelBookingPage({super.key});
@@ -92,7 +94,22 @@ class HotelBookingPage extends StatelessWidget {
                           const SizedBox(height: 20),
                           Container(
                             margin: const EdgeInsets.only(top: 70),
-                            child: const SearchBarWidget(),
+                            child: SearchBarWidget(
+                              onSearch: (params) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => RoomSearchPage(
+                                      checkInDate: params['checkInDate'],
+                                      checkOutDate: params['checkOutDate'],
+                                      roomCount: params['roomCount'],
+                                      adults: params['adults'],
+                                      children: params['children'],
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
                           ),
                         ],
                       ),
@@ -148,12 +165,13 @@ class HotelBookingPage extends StatelessWidget {
                                 cursor: SystemMouseCursors.click,
                                 child: GestureDetector(
                                   onTap: () {
-                                    // Navigator.of(context).push(
-                                    //   MaterialPageRoute(
-                                    //     builder: (context) =>
-                                    //         AllRoomsPage(rooms: rooms),
-                                    //   ),
-                                    // );
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            AllRoomsPage(rooms: rooms),
+                                      ),
+                                    );
                                   },
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,

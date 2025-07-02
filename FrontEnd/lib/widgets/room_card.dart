@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/room.dart';
+import '../screens/room_detail_page.dart';
 
 class RoomCard extends StatelessWidget {
   final Room room;
@@ -25,7 +26,8 @@ class RoomCard extends StatelessWidget {
             child: Stack(
               children: [
                 ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(12)),
                   child: Image.asset(
                     room.imagePath,
                     width: double.infinity,
@@ -36,7 +38,8 @@ class RoomCard extends StatelessWidget {
                   bottom: 10,
                   left: 10,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     color: Colors.blue[900],
                     child: room.oldPrice != null
                         ? RichText(
@@ -77,7 +80,8 @@ class RoomCard extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(12),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center, // ✅ can giữa nội dung bên trong
+              crossAxisAlignment:
+                  CrossAxisAlignment.center, // ✅ can giữa nội dung bên trong
               children: [
                 Text(
                   room.name,
@@ -89,7 +93,8 @@ class RoomCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.center, // ✅ icon và text nằm giữa
+                  mainAxisAlignment:
+                      MainAxisAlignment.center, // ✅ icon và text nằm giữa
                   children: [
                     const Icon(Icons.bed_outlined, size: 16),
                     const SizedBox(width: 5),
@@ -102,9 +107,17 @@ class RoomCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => RoomDetailPage(room: room),
+                      ),
+                    );
+                  },
                   child: Row(
-                    mainAxisSize: MainAxisSize.min, // ✅ chỉ chiếm kích thước cần thiết
+                    mainAxisSize:
+                        MainAxisSize.min, // ✅ chỉ chiếm kích thước cần thiết
                     children: const [
                       Text(
                         'BOOK NOW',

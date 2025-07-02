@@ -3,7 +3,9 @@ import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 class SearchBarWidget extends StatefulWidget {
-  const SearchBarWidget({super.key});
+  final void Function(dynamic)? onSearch;
+
+  const SearchBarWidget({super.key, this.onSearch});
 
   @override
   State<SearchBarWidget> createState() => _SearchBarWidgetState();
@@ -82,10 +84,20 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
 
   void _handleSearch() {
     if (_formKey.currentState!.validate()) {
+      // ✅ Gọi callback nếu được truyền từ bên ngoài
+      widget.onSearch?.call({
+        'checkInDate': checkInDate,
+        'checkOutDate': checkOutDate,
+        'roomCount': roomCount,
+        'adults': adults,
+        'children': children,
+      });
+
+      // (Tuỳ chọn) Thông báo xác nhận
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Searching for $roomCount rooms in $location from ${formatDate(checkInDate)} to ${formatDate(checkOutDate)} for $adults adults and $children children',
+            'Searching for $roomCount rooms from ${formatDate(checkInDate)} to ${formatDate(checkOutDate)} for $adults adults and $children children',
           ),
         ),
       );
@@ -130,7 +142,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
             borderRadius: BorderRadius.circular(12),
             boxShadow: const [
               BoxShadow(
-                color: Colors.black26,
+                color: Color.fromARGB(66, 231, 227, 227),
                 blurRadius: 12,
                 offset: Offset(0, 4),
               ),
