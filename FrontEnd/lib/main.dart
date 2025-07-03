@@ -24,7 +24,7 @@ class HotelBookingApp extends StatelessWidget {
       routes: {
         '/': (context) => SplashScreen(),
         '/login': (context) => LoginScreen(),
-        '/home': (context) => HomeScreen(),
+        '/home': (context) => HotelBookingPage(),
       },
     );
   }

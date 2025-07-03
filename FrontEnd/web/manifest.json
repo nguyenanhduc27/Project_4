@@ -1,6 +1,11 @@
 {
+<<<<<<< HEAD
     "name": "hotel_booking_app",
     "short_name": "hotel_booking_app",
+=======
+    "name": "frontend",
+    "short_name": "frontend",
+>>>>>>> origin/DucNguyenAnh
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
