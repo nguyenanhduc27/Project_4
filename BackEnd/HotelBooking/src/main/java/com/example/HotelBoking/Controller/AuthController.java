@@ -4,6 +4,7 @@ import com.example.HotelBoking.DTO.AuthRequest;
 import com.example.HotelBoking.DTO.JwtResponse;
 import com.example.HotelBoking.DTO.OtpRequest;
 import com.example.HotelBoking.DTO.UserDTO;
+import com.example.HotelBoking.Repository.UserRepository;
 import com.example.HotelBoking.Service.CustomUserDetailsService;
 import com.example.HotelBoking.Service.EmailService;
 import com.example.HotelBoking.Service.OtpService;
@@ -38,7 +39,7 @@ public class AuthController {
 
     @Autowired private OtpService otpService;
     @Autowired private EmailService emailService;
-
+    @Autowired private UserRepository userRepository;
     // Bước 1: Gửi OTP đến email nếu tài khoản tồn tại
     @PostMapping("/request-code")
     public ResponseEntity<?> requestLogin(@RequestBody AuthRequest request) {
@@ -64,9 +65,17 @@ public class AuthController {
         if (!otpService.verifyOtp(request.getEmail(), request.getOtp())) {
             return ResponseEntity.status(401).body("OTP không đúng hoặc đã hết hạn");
         }
+        
+        User user = userRepository.findByEmail(request.getEmail());
+        if (user == null) {
+            user = new User();
+            user.setEmail(request.getEmail());
+            user.setPassword(""); // hoặc random, hoặc null
+            userRepository.save(user);
+        }
 
-        UserDetails user = userDetailsService.loadUserByUsername(request.getEmail());
-        String token = jwtUtil.generateToken(user.getUsername());
+        UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
+        String token = jwtUtil.generateToken(userDetails.getUsername());
 
         return ResponseEntity.ok(new JwtResponse(token));
     }

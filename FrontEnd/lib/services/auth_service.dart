@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import '../models/user.dart';
+// import '../models/user.dart';
 
 class AuthService {
-  static const _baseUrl = 'http://localhost:8000/api';
+  static const _baseUrl = 'http://localhost:8080/api';
   final _storage = FlutterSecureStorage();
 
   Future<bool> requestLoginCode(String email) async {
@@ -38,7 +38,7 @@ class AuthService {
     }
     return false;
   }
-  
+
   Future<void> saveToken(String token) async {
     await _storage.write(key: 'token', value: token);
   }
