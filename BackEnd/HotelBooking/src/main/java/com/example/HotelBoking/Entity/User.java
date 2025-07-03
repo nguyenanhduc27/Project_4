@@ -2,6 +2,8 @@ package com.example.HotelBoking.Entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+
+import com.example.HotelBoking.Enum.Role;
 import java.time.LocalDateTime;
 
 @Entity
@@ -26,15 +28,20 @@ public class User {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role = Role.User;
+
     public User(){}
 
-    public User(Long id, String fullName, String email, String password, String phone, LocalDateTime createdAt) {
+    public User(Long id, String fullName, String email, String password, String phone, LocalDateTime createdAt, Role role) {
         this.id = id;
         this.fullName = fullName;
         this.email = email;
         this.password = password;
         this.phone = phone;
         this.createdAt = createdAt;
+        this.role = role;
     }
 
     public Long getId() {
@@ -83,5 +90,13 @@ public class User {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 }
