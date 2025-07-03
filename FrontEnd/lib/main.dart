@@ -18,13 +18,13 @@ class HotelBookingApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Hotel Booking App',
+      title: 'Hotel Bookingg App',
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
       routes: {
         '/': (context) => SplashScreen(),
         '/login': (context) => LoginScreen(),
-        '/home': (context) => HomeScreen(),
+        '/home': (context) => HotelBookingPage(),
       },
     );
   }
