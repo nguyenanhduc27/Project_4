@@ -55,7 +55,7 @@ public class AuthController {
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Lỗi gửi email: " + e.getMessage());
         }
-        return ResponseEntity.ok("Mã OTP đã được gửi đến email.");
+        return ResponseEntity.ok("Mã OTP đã được gửi đến email. Mã có hiệu lực trong 1 phút.");
     }
 
 
