@@ -251,7 +251,7 @@ class _RoomSliderState extends State<_RoomSlider> {
 
   double cardWidth = 300;
   final double spacing = 20;
-  final double cardHeight = 500;
+  final double cardHeight = 300;
 
   @override
   void initState() {
