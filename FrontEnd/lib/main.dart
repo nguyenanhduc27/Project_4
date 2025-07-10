@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hotel_booking_app/providers/auth_provider.dart';
 import 'package:provider/provider.dart';
-import 'screens/splash_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
 
@@ -20,9 +19,8 @@ class HotelBookingApp extends StatelessWidget {
     return MaterialApp(
       title: 'Hotel Bookingg App',
       debugShowCheckedModeBanner: false,
-      initialRoute: '/',
+      initialRoute: '/home',
       routes: {
-        '/': (context) => SplashScreen(),
         '/login': (context) => LoginScreen(),
         '/home': (context) => HotelBookingPage(),
       },
