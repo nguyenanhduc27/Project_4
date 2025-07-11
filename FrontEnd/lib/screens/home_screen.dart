@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
 import '../widgets/custom_header.dart';
 import '../widgets/custom_footer.dart';
 import '../widgets/search_bar_widget.dart';
@@ -8,8 +10,22 @@ import '../models/room.dart';
 import 'all_room_pages.dart';
 import 'room_search_page.dart';
 
-class HotelBookingPage extends StatelessWidget {
+class HotelBookingPage extends StatefulWidget {
   const HotelBookingPage({super.key});
+
+  @override
+  State<HotelBookingPage> createState() => _HotelBookingPageState();
+}
+
+class _HotelBookingPageState extends State<HotelBookingPage> {
+  @override
+  void initState() {
+    super.initState();
+    // Kiểm tra trạng thái đăng nhập khi trang home được load
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<AuthProvider>(context, listen: false).checkLogin();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -251,7 +267,7 @@ class _RoomSliderState extends State<_RoomSlider> {
 
   double cardWidth = 300;
   final double spacing = 20;
-  final double cardHeight = 300;
+  final double cardHeight = 500;
 
   @override
   void initState() {
