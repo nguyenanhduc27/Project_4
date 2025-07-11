@@ -4,7 +4,6 @@ import com.example.HotelBoking.DTO.UserDTO;
 import com.example.HotelBoking.Entity.User;
 import com.example.HotelBoking.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -17,16 +16,12 @@ public class UserService {
     @Autowired
     private UserRepository repo;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
     // Chuyển từ DTO sang Entity
     public User toEntity(UserDTO dto) {
         User u = new User();
         u.setId(dto.getId());
         u.setFullName(dto.getFullName());
         u.setEmail(dto.getEmail());
-        u.setPassword(dto.getPassword());
         u.setPhone(dto.getPhone());
         return u;
     }
@@ -37,7 +32,6 @@ public class UserService {
         dto.setId(u.getId());
         dto.setFullName(u.getFullName());
         dto.setEmail(u.getEmail());
-        dto.setPassword(u.getPassword());
         dto.setPhone(u.getPhone());
         return dto;
     }

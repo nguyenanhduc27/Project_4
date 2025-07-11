@@ -70,7 +70,6 @@ public class AuthController {
         if (user == null) {
             user = new User();
             user.setEmail(request.getEmail());
-            user.setPassword(""); // hoặc random, hoặc null
             userRepository.save(user);
         }
 
