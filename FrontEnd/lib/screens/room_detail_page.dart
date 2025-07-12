@@ -1,3 +1,5 @@
+// hotel_detail_page
+
 import 'package:flutter/material.dart';
 import '../models/room.dart';
 import '../models/HotelMarker.dart';
@@ -433,7 +435,7 @@ class _RoomDetailPageState extends State<RoomDetailPage> {
                   ),
                   alignment: Alignment.center,
                   child: const Text(
-                    'Room Details',
+                    'Hotel Details',
                     style: TextStyle(
                       fontSize: 36,
                       fontWeight: FontWeight.bold,
