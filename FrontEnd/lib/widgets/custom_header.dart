@@ -73,10 +73,86 @@ class _CustomHeaderState extends State<CustomHeader> {
                         ),
                       ),
 
-                      // Login & Sign Up or My Account
-                      authProvider.isAuthenticated
-                          ? _buildMyAccountDropdown()
-                          : _buildLoginSignUp(),
+                      // Login & Sign Up
+                      Consumer<AuthProvider>(
+                        builder: (context, authProvider, child) {
+                          if (authProvider.isLoggedIn) {
+                            // ĐÃ ĐĂNG NHẬP
+                            return Row(
+                              children: [
+                                IconButton(
+                                  icon: Icon(Icons.person,
+                                      color: Color(0xFF424242)),
+                                  onPressed: () {
+                                    // Điều hướng đến trang profile nếu có
+                                    Navigator.pushNamed(
+                                        context, '/personal_infor');
+                                  },
+                                ),
+                                Container(
+                                  width: 1,
+                                  height: 24,
+                                  color: Color(0xFF424242),
+                                  margin: EdgeInsets.only(left: 28),
+                                ),
+                                SizedBox(width: 16),
+                                TextButton(
+                                  onPressed: () {
+                                    authProvider.logout(); // Gọi logout
+                                  },
+                                  child: Text(
+                                    'Logout',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xFF424242),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          } else {
+                            // CHƯA ĐĂNG NHẬP
+                            return Row(
+                              children: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pushNamed(context, '/login');
+                                  },
+                                  child: Text(
+                                    'Login',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xFF424242),
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  width: 1,
+                                  height: 24,
+                                  color: Color(0xFF424242),
+                                  margin: EdgeInsets.only(left: 28),
+                                ),
+                                SizedBox(width: 32),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pushNamed(context, '/signup');
+                                  },
+                                  child: Text(
+                                    'Sign Up',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xFF424242),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          }
+                        },
+                      ),
                     ],
                   ),
                 ),

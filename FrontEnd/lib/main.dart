@@ -29,4 +29,3 @@ class HotelBookingApp extends StatelessWidget {
     );
   }
 }
-
