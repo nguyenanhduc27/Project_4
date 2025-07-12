@@ -66,11 +66,13 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
           infoRows.add(_buildAddressRow());
           break;
         default:
-          infoRows.add(_buildInfoRow(context, entries[i].key, entries[i].value));
+          infoRows
+              .add(_buildInfoRow(context, entries[i].key, entries[i].value));
       }
       if (i < entries.length - 1) {
         infoRows.add(const Divider(height: 1, color: Color(0xFFE0E0E0)));
-        infoRows.add(const SizedBox(height: 12)); // Thêm khoảng cách giữa các trường
+        infoRows.add(
+            const SizedBox(height: 12)); // Thêm khoảng cách giữa các trường
       }
     }
 
@@ -82,7 +84,8 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
           Expanded(
             child: SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 32),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 32),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -101,7 +104,8 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                           const SizedBox(height: 8),
                           const Text(
                             'Cập nhật thông tin của bạn và tìm hiểu các thông tin này được sử dụng ra sao.',
-                            style: TextStyle(fontSize: 16, color: Colors.black54),
+                            style:
+                                TextStyle(fontSize: 16, color: Colors.black54),
                           ),
                           const SizedBox(height: 32),
                           ...infoRows,
@@ -123,7 +127,10 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
     if (isEditingName) {
       return Row(
         children: [
-          SizedBox(width: 120, child: Text('Tên', style: TextStyle(fontWeight: FontWeight.bold))),
+          SizedBox(
+              width: 120,
+              child:
+                  Text('Tên', style: TextStyle(fontWeight: FontWeight.bold))),
           Expanded(
             child: TextField(
               controller: nameController,
@@ -159,7 +166,10 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
     } else {
       return Row(
         children: [
-          SizedBox(width: 120, child: Text('Tên', style: TextStyle(fontWeight: FontWeight.bold))),
+          SizedBox(
+              width: 120,
+              child:
+                  Text('Tên', style: TextStyle(fontWeight: FontWeight.bold))),
           Expanded(
             child: Text(
               name.isEmpty ? 'Hãy cho chúng tôi biết tên gọi của bạn' : name,
@@ -199,7 +209,10 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
         children: [
           Row(
             children: [
-              SizedBox(width: 120, child: Text('Địa chỉ email', style: TextStyle(fontWeight: FontWeight.bold))),
+              SizedBox(
+                  width: 120,
+                  child: Text('Địa chỉ email',
+                      style: TextStyle(fontWeight: FontWeight.bold))),
               Expanded(
                 child: TextField(
                   controller: emailController,
@@ -241,21 +254,26 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
         children: [
           Row(
             children: [
-              SizedBox(width: 120, child: Text('Địa chỉ email', style: TextStyle(fontWeight: FontWeight.bold))),
+              SizedBox(
+                  width: 120,
+                  child: Text('Địa chỉ email',
+                      style: TextStyle(fontWeight: FontWeight.bold))),
               Expanded(
                 child: Text(
                   email.isEmpty ? 'Nhập địa chỉ email của bạn' : email,
                   style: TextStyle(
                     fontSize: 16,
                     color: email.isEmpty ? Colors.grey[400] : Colors.black,
-                    fontStyle: email.isEmpty ? FontStyle.normal : FontStyle.normal,
+                    fontStyle:
+                        email.isEmpty ? FontStyle.normal : FontStyle.normal,
                   ),
                 ),
               ),
               if (email.isNotEmpty)
                 Container(
                   margin: const EdgeInsets.only(left: 8),
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
                     color: Colors.green,
                     borderRadius: BorderRadius.circular(4),
@@ -297,7 +315,10 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
         children: [
           Row(
             children: [
-              SizedBox(width: 120, child: Text('Số điện thoại', style: TextStyle(fontWeight: FontWeight.bold))),
+              SizedBox(
+                  width: 120,
+                  child: Text('Số điện thoại',
+                      style: TextStyle(fontWeight: FontWeight.bold))),
               Expanded(
                 child: TextField(
                   controller: phoneController,
@@ -339,14 +360,18 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
         children: [
           Row(
             children: [
-              SizedBox(width: 120, child: Text('Số điện thoại', style: TextStyle(fontWeight: FontWeight.bold))),
+              SizedBox(
+                  width: 120,
+                  child: Text('Số điện thoại',
+                      style: TextStyle(fontWeight: FontWeight.bold))),
               Expanded(
                 child: Text(
                   phone.isEmpty ? 'Thêm số điện thoại của bạn' : phone,
                   style: TextStyle(
                     fontSize: 16,
                     color: phone.isEmpty ? Colors.grey[400] : Colors.black,
-                    fontStyle: phone.isEmpty ? FontStyle.normal : FontStyle.normal,
+                    fontStyle:
+                        phone.isEmpty ? FontStyle.normal : FontStyle.normal,
                   ),
                 ),
               ),
@@ -371,7 +396,10 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
     if (isEditingDob) {
       return Row(
         children: [
-          SizedBox(width: 120, child: Text('Ngày sinh', style: TextStyle(fontWeight: FontWeight.bold))),
+          SizedBox(
+              width: 120,
+              child: Text('Ngày sinh',
+                  style: TextStyle(fontWeight: FontWeight.bold))),
           Expanded(
             child: TextField(
               controller: dobController,
@@ -407,7 +435,10 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
     } else {
       return Row(
         children: [
-          SizedBox(width: 120, child: Text('Ngày sinh', style: TextStyle(fontWeight: FontWeight.bold))),
+          SizedBox(
+              width: 120,
+              child: Text('Ngày sinh',
+                  style: TextStyle(fontWeight: FontWeight.bold))),
           Expanded(
             child: Text(
               dob.isEmpty ? 'Nhập ngày sinh của bạn' : dob,
@@ -436,7 +467,10 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
     if (isEditingAddress) {
       return Row(
         children: [
-          SizedBox(width: 120, child: Text('Địa chỉ', style: TextStyle(fontWeight: FontWeight.bold))),
+          SizedBox(
+              width: 120,
+              child: Text('Địa chỉ',
+                  style: TextStyle(fontWeight: FontWeight.bold))),
           Expanded(
             child: TextField(
               controller: addressController,
@@ -472,14 +506,18 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
     } else {
       return Row(
         children: [
-          SizedBox(width: 120, child: Text('Địa chỉ', style: TextStyle(fontWeight: FontWeight.bold))),
+          SizedBox(
+              width: 120,
+              child: Text('Địa chỉ',
+                  style: TextStyle(fontWeight: FontWeight.bold))),
           Expanded(
             child: Text(
               address.isEmpty ? 'Nhập địa chỉ của bạn' : address,
               style: TextStyle(
                 fontSize: 16,
                 color: address.isEmpty ? Colors.grey[400] : Colors.black,
-                fontStyle: address.isEmpty ? FontStyle.normal : FontStyle.normal,
+                fontStyle:
+                    address.isEmpty ? FontStyle.normal : FontStyle.normal,
               ),
             ),
           ),
@@ -505,7 +543,8 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
     String? description1;
     String? description2;
     if (isEmail) {
-      description1 = 'Đây là địa chỉ email bạn dùng để đăng nhập. Chúng tôi cũng sẽ gửi các xác nhận đặt chỗ tới địa chỉ này.';
+      description1 =
+          'Đây là địa chỉ email bạn dùng để đăng nhập. Chúng tôi cũng sẽ gửi các xác nhận đặt chỗ tới địa chỉ này.';
     }
     if (isPhone) {
       description1 = 'Thêm số điện thoại của bạn';
@@ -535,15 +574,19 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                         value.isEmpty ? _getPlaceholder(label) : value,
                         style: TextStyle(
                           fontSize: 16,
-                          color: value.isEmpty ? Colors.grey[400] : Colors.black,
-                          fontStyle: value.isEmpty ? FontStyle.normal : FontStyle.normal,
+                          color:
+                              value.isEmpty ? Colors.grey[400] : Colors.black,
+                          fontStyle: value.isEmpty
+                              ? FontStyle.normal
+                              : FontStyle.normal,
                         ),
                       ),
                     ),
                     if (isEmail && value.isNotEmpty)
                       Container(
                         margin: const EdgeInsets.only(left: 8),
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
                           color: Colors.green,
                           borderRadius: BorderRadius.circular(4),
@@ -557,7 +600,8 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                       onPressed: () {
                         // chuyển sang chế độ chỉnh sửa
                       },
-                      child: const Text('Chỉnh sửa', style: TextStyle(color: Colors.blue)),
+                      child: const Text('Chỉnh sửa',
+                          style: TextStyle(color: Colors.blue)),
                     ),
                   ],
                 ),
@@ -566,15 +610,19 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                     padding: const EdgeInsets.only(top: 4.0),
                     child: Text(
                       description1,
-                      style: const TextStyle(fontSize: 13, color: Colors.black54),
+                      style:
+                          const TextStyle(fontSize: 13, color: Colors.black54),
                     ),
                   ),
+
+                // ấdasdasd
                 if (description2 != null)
                   Padding(
                     padding: const EdgeInsets.only(top: 2.0),
                     child: Text(
                       description2,
-                      style: const TextStyle(fontSize: 13, color: Colors.black54),
+                      style:
+                          const TextStyle(fontSize: 13, color: Colors.black54),
                     ),
                   ),
               ],
