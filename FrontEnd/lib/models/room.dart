@@ -1,17 +1,21 @@
 class Room {
+  final int id;
+  final int hotelId;
   final String name;
-  final String imagePath;
   final String bedInfo;
-  final String guestInfo;
-  final String price;
-  final String? oldPrice;
+  final int guestCount;
+  final double price;
+  final String description;
+  final List<String> imageUrls;
 
   Room({
+    required this.id,
+    required this.hotelId,
     required this.name,
-    required this.imagePath,
     required this.bedInfo,
-    required this.guestInfo,
+    required this.guestCount,
     required this.price,
-    this.oldPrice,
+    required this.description,
+    required this.imageUrls,
   });
 }

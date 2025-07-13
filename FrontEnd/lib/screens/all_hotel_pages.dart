@@ -1,30 +1,29 @@
 import 'package:flutter/material.dart';
-import '../models/room.dart';
-import '../widgets/room_card.dart';
+import '../models/hotel.dart';
+import '../widgets/hotel_card.dart';
 import '../widgets/custom_header.dart';
 import '../widgets/custom_footer.dart';
 
-class AllRoomsPage extends StatelessWidget {
-  final List<Room> rooms;
+class AllHotelsPage extends StatelessWidget {
+  final List<Hotel> hotels;
 
-  const AllRoomsPage({super.key, required this.rooms});
+  const AllHotelsPage({Key? key, required this.hotels}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20), // ✅ Padding 2 bên
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         child: LayoutBuilder(
           builder: (context, constraints) {
             return CustomScrollView(
               slivers: [
-                // ✅ HEADER
                 SliverToBoxAdapter(
                   child: CustomHeader(),
                 ),
 
-                // ✅ KHỐI 1: TIÊU ĐỀ ALL ROOMS có nền
+                // Tiêu đề ALL HOTELS với background
                 SliverToBoxAdapter(
                   child: Container(
                     width: double.infinity,
@@ -38,7 +37,7 @@ class AllRoomsPage extends StatelessWidget {
                     ),
                     child: const Center(
                       child: Text(
-                        'All Rooms',
+                        'All Hotels',
                         style: TextStyle(
                           fontSize: 36,
                           fontWeight: FontWeight.bold,
@@ -49,11 +48,12 @@ class AllRoomsPage extends StatelessWidget {
                   ),
                 ),
 
-                // ✅ KHỐI 2: GRID PHÒNG
+                // Grid hotel cards
                 SliverPadding(
-                  padding: const EdgeInsets.only(top: 20, bottom: 20), // padding dọc riêng
+                  padding: const EdgeInsets.symmetric(vertical: 20),
                   sliver: SliverGrid(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3,
                       crossAxisSpacing: 20,
                       mainAxisSpacing: 20,
@@ -61,14 +61,14 @@ class AllRoomsPage extends StatelessWidget {
                     ),
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
-                        return RoomCard(room: rooms[index]);
+                        return HotelCard(hotel: hotels[index]);
                       },
-                      childCount: rooms.length,
+                      childCount: hotels.length,
                     ),
                   ),
                 ),
 
-                // ✅ FOOTER
+                // Footer
                 SliverFillRemaining(
                   hasScrollBody: false,
                   child: Column(

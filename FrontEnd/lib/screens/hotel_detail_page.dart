@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../models/room.dart';
 import '../models/HotelMarker.dart';
 import '../models/RoomOption.dart';
 import '../widgets/custom_header.dart';
@@ -7,17 +6,17 @@ import '../widgets/custom_footer.dart';
 import '../widgets/booking_dropdown_form.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import '../models/hotel.dart';
+import '../models/room.dart';
 
-class RoomDetailPage extends StatefulWidget {
-  final Room room;
-
-  const RoomDetailPage({super.key, required this.room});
-
+class HotelDetailPage extends StatefulWidget {
+  final Hotel hotel;
+  const HotelDetailPage({super.key, required this.hotel});
   @override
-  State<RoomDetailPage> createState() => _RoomDetailPageState();
+  State<HotelDetailPage> createState() => _HotelDetailPageState();
 }
 
-class _RoomDetailPageState extends State<RoomDetailPage> {
+class _HotelDetailPageState extends State<HotelDetailPage> {
   final List<HotelMarker> hotelMarkers = [
     HotelMarker(
         name: 'Khách sạn 1',
@@ -86,8 +85,131 @@ class _RoomDetailPageState extends State<RoomDetailPage> {
       payLater: false,
     ),
   ];
+  final List<Room> roomDetails = [
+    Room(
+      id: 1,
+      hotelId: 1,
+      name: 'Phòng Deluxe Sea View',
+      bedInfo: '1 Giường King',
+      guestCount: 2,
+      price: 1800000,
+      description:
+          'Phòng nhìn thẳng ra biển, ban công rộng, nội thất sang trọng.',
+      imageUrls: ['images/room1.jpg', 'images/room2.jpg', 'images/room3.jpg'],
+    ),
+    Room(
+      id: 2,
+      hotelId: 1,
+      name: 'Phòng Suite City View',
+      bedInfo: '2 Giường Đơn',
+      guestCount: 3,
+      price: 2200000,
+      description: 'Phòng nhìn ra thành phố với view đẹp, đầy đủ tiện nghi.',
+      imageUrls: ['images/room4.jpg', 'images/room5.jpg'],
+    ),
+  ];
 
   HotelMarker? selectedHotel;
+  void _showRoomDetailPopup(RoomOption roomOption, int index) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          insetPadding: EdgeInsets.all(20),
+          backgroundColor: Colors.white,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: SizedBox(
+            width: 600,
+            height: 600,
+            child: Column(
+              children: [
+                // Slider ảnh phòng
+                SizedBox(
+                  height: 280,
+                  child: PageView.builder(
+                    itemCount: roomImages.length,
+                    itemBuilder: (context, imgIndex) {
+                      return ClipRRect(
+                        borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(16)),
+                        child: Image.asset(
+                          roomImages[(index + imgIndex) % roomImages.length],
+                          fit: BoxFit.cover,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 16),
+                // Thông tin phòng
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        roomOption.type,
+                        style: const TextStyle(
+                            fontSize: 22, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      Text('Giường: ${roomOption.bedInfo}'),
+                      Text('Số khách tối đa: ${roomOption.guestCount} người'),
+                      const SizedBox(height: 12),
+                      Wrap(
+                        spacing: 10,
+                        runSpacing: 10,
+                        children: [
+                          _amenityTag(Icons.wifi, 'Wifi miễn phí'),
+                          _amenityTag(Icons.restaurant, 'Bữa sáng miễn phí'),
+                          if (roomOption.freeCancellation)
+                            _amenityTag(Icons.check_circle, 'Hủy miễn phí'),
+                          if (roomOption.payLater)
+                            _amenityTag(Icons.payment, 'Thanh toán sau'),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        '${roomOption.price.toStringAsFixed(0)} VND/đêm (gồm thuế)',
+                        style: const TextStyle(
+                            fontSize: 20,
+                            color: Colors.blue,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          onPressed: () {
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content: Text(
+                                      'Đã đặt phòng ${roomOption.type} thành công!')),
+                            );
+                          },
+                          child: const Text('Đặt ngay',
+                              style: TextStyle(fontSize: 16)),
+                        ),
+                      )
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 
   void _showMapPopup() {
     showDialog(
@@ -343,23 +465,6 @@ class _RoomDetailPageState extends State<RoomDetailPage> {
     );
   }
 
-  Widget _infoItem(IconData icon, String title, String value) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: 24),
-        const SizedBox(width: 8),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-            Text(value, style: const TextStyle(color: Colors.grey)),
-          ],
-        )
-      ],
-    );
-  }
-
   static Widget _amenityItem(IconData icon, String label) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -413,6 +518,28 @@ class _RoomDetailPageState extends State<RoomDetailPage> {
     );
   }
 
+  Widget _hotelAmenityItem(IconData icon, String label) {
+    return Container(
+      height: 48,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 24, color: Colors.black87),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 14, color: Colors.black87),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -433,7 +560,7 @@ class _RoomDetailPageState extends State<RoomDetailPage> {
                   ),
                   alignment: Alignment.center,
                   child: const Text(
-                    'Room Details',
+                    'Hotel Details',
                     style: TextStyle(
                       fontSize: 36,
                       fontWeight: FontWeight.bold,
@@ -461,11 +588,11 @@ class _RoomDetailPageState extends State<RoomDetailPage> {
                                   flex: 2,
                                   child: GestureDetector(
                                     onTap: () => _openImageGallery(
-                                        widget.room.imagePath),
+                                        widget.hotel.thumbnailUrl),
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(12),
                                       child: Image.asset(
-                                        widget.room.imagePath,
+                                        widget.hotel.thumbnailUrl,
                                         height: 300,
                                         fit: BoxFit.cover,
                                       ),
@@ -506,7 +633,7 @@ class _RoomDetailPageState extends State<RoomDetailPage> {
                               ],
                             ),
                             const SizedBox(height: 30),
-                            Text(widget.room.name,
+                            Text(widget.hotel.name,
                                 style: const TextStyle(
                                     fontSize: 32, fontWeight: FontWeight.bold)),
                             const SizedBox(height: 15),
@@ -526,21 +653,6 @@ class _RoomDetailPageState extends State<RoomDetailPage> {
                                   ),
                                 ],
                               ),
-                            ),
-                            const SizedBox(height: 20),
-                            Wrap(
-                              spacing: 40,
-                              runSpacing: 20,
-                              children: [
-                                _infoItem(
-                                    Icons.bed, 'Bed', widget.room.bedInfo),
-                                _infoItem(Icons.people, 'Max Guest',
-                                    widget.room.guestInfo),
-                                _infoItem(
-                                    Icons.square_foot, 'Room Space', '38 sqm.'),
-                                _infoItem(
-                                    Icons.landscape, 'Room View', 'City View'),
-                              ],
                             ),
                             const SizedBox(height: 30),
                             const Text(
@@ -570,6 +682,31 @@ class _RoomDetailPageState extends State<RoomDetailPage> {
                                 _amenityItem(Icons.blur_on, 'Heater'),
                                 _amenityItem(Icons.phone, 'Phone'),
                                 _amenityItem(Icons.bathroom, 'Hair Dryer'),
+                              ],
+                            ),
+                            const SizedBox(height: 30),
+                            const Divider(),
+                            const Text('Hotel Amenities',
+                                style: TextStyle(
+                                    fontSize: 20, fontWeight: FontWeight.bold)),
+                            const SizedBox(height: 20),
+                            Wrap(
+                              spacing: 16,
+                              runSpacing: 16,
+                              children: [
+                                _hotelAmenityItem(Icons.fitness_center, 'Gym'),
+                                _hotelAmenityItem(
+                                    Icons.local_parking, 'Parking'),
+                                _hotelAmenityItem(Icons.spa, 'Spa'),
+                                _hotelAmenityItem(
+                                    Icons.restaurant, 'Restaurant'),
+                                _hotelAmenityItem(
+                                    Icons.room_service, 'Room Service'),
+                                _hotelAmenityItem(Icons.pool, 'Swimming Pool'),
+                                _hotelAmenityItem(
+                                    Icons.support_agent, '24 Hour Concierge'),
+                                _hotelAmenityItem(Icons.local_laundry_service,
+                                    'Inhouse Laundry'),
                               ],
                             ),
                             const SizedBox(height: 40),
@@ -744,13 +881,8 @@ class _RoomDetailPageState extends State<RoomDetailPage> {
                                             const SizedBox(height: 8),
                                             ElevatedButton(
                                               onPressed: () {
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(
-                                                  SnackBar(
-                                                    content: Text(
-                                                        'Đặt phòng ${option.type} thành công!'),
-                                                  ),
-                                                );
+                                                _showRoomDetailPopup(
+                                                    option, index);
                                               },
                                               style: ElevatedButton.styleFrom(
                                                 backgroundColor: Colors.blue,

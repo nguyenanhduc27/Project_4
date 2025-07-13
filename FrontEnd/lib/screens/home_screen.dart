@@ -1,71 +1,85 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
 import '../widgets/custom_header.dart';
 import '../widgets/custom_footer.dart';
 import '../widgets/search_bar_widget.dart';
-import '../widgets/room_card.dart';
-import '../models/room.dart';
-import 'all_room_pages.dart';
-import 'room_search_page.dart';
+import '../widgets/hotel_card.dart';
+import '../models/hotel.dart';
+import 'all_hotel_pages.dart';
+import 'hotel_search_page.dart';
 
-class HotelBookingPage extends StatelessWidget {
+class HotelBookingPage extends StatefulWidget {
   const HotelBookingPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final List<Room> rooms = [
-      Room(
-        name: 'Luxury Suite',
-        imagePath: 'images/room1.jpg',
-        bedInfo: '1 King Bed',
-        guestInfo: '4 Guests',
-        price: '\$90',
-      ),
-      Room(
-        name: 'Standard Deluxe',
-        imagePath: 'images/room2.jpg',
-        bedInfo: '2 Single Beds',
-        guestInfo: '6 Guests',
-        price: '\$75',
-      ),
-      Room(
-        name: 'The Penthouse',
-        imagePath: 'images/room3.jpg',
-        bedInfo: '2 King Beds',
-        guestInfo: '6 Guests',
-        price: '\$200',
-        oldPrice: '\$250',
-      ),
-      Room(
-        name: 'Cozy Queen Room',
-        imagePath: 'images/room4.jpg',
-        bedInfo: '1 Queen Bed',
-        guestInfo: '2 Guests',
-        price: '\$60',
-      ),
-      Room(
-        name: 'Family Room',
-        imagePath: 'images/room5.jpg',
-        bedInfo: '2 Queen Beds',
-        guestInfo: '5 Guests',
-        price: '\$120',
-      ),
-      Room(
-        name: 'Economy Room',
-        imagePath: 'images/room6.jpg',
-        bedInfo: '1 Double Bed',
-        guestInfo: '2 Guests',
-        price: '\$50',
-      ),
-      Room(
-        name: 'Romantic Getaway',
-        imagePath: 'images/room7.jpg',
-        bedInfo: '1 Queen Bed',
-        guestInfo: '2 Guests',
-        price: '\$130',
-      ),
-    ];
+  State<HotelBookingPage> createState() => _HotelBookingPageState();
+}
 
+class _HotelBookingPageState extends State<HotelBookingPage> {
+  // Dữ liệu khách sạn mẫu
+  final List<Hotel> hotels = [
+    Hotel(
+      id: 1,
+      name: 'Vinpearl Resort',
+      address: 'Nha Trang',
+      description: 'Khu nghỉ dưỡng 5 sao đẳng cấp',
+      starRating: 5,
+      thumbnailUrl: 'images/room1.jpg',
+    ),
+    Hotel(
+      id: 2,
+      name: 'FLC Luxury Hotel',
+      address: 'Quy Nhơn',
+      description: 'Resort biển sang trọng',
+      starRating: 4,
+      thumbnailUrl: 'images/room2.jpg',
+    ),
+    Hotel(
+      id: 2,
+      name: 'FLC Luxury Hotel',
+      address: 'Quy Nhơn',
+      description: 'Resort biển sang trọng',
+      starRating: 4,
+      thumbnailUrl: 'images/room3.jpg',
+    ),
+    Hotel(
+      id: 2,
+      name: 'FLC Luxury Hotel',
+      address: 'Quy Nhơn',
+      description: 'Resort biển sang trọng',
+      starRating: 4,
+      thumbnailUrl: 'images/room4.jpg',
+    ),
+    Hotel(
+      id: 2,
+      name: 'FLC Luxury Hotel',
+      address: 'Quy Nhơn',
+      description: 'Resort biển sang trọng',
+      starRating: 4,
+      thumbnailUrl: 'images/room5.jpg',
+    ),
+    Hotel(
+      id: 2,
+      name: 'FLC Luxury Hotel',
+      address: 'Quy Nhơn',
+      description: 'Resort biển sang trọng',
+      starRating: 4,
+      thumbnailUrl: 'images/room6.jpg',
+    ),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<AuthProvider>(context, listen: false).checkLogin();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
@@ -76,7 +90,7 @@ class HotelBookingPage extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 children: [
-                  // Hero section
+                  // Hero
                   Container(
                     height: 750,
                     width: double.infinity,
@@ -106,7 +120,7 @@ class HotelBookingPage extends StatelessWidget {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) => RoomSearchPage(
+                                    builder: (_) => HotelSearchPage(
                                       checkInDate: params['checkInDate'],
                                       checkOutDate: params['checkOutDate'],
                                       roomCount: params['roomCount'],
@@ -125,7 +139,7 @@ class HotelBookingPage extends StatelessWidget {
 
                   const SizedBox(height: 50),
                   const Text(
-                    'Our Rooms',
+                    'Our Hotels',
                     style: TextStyle(fontSize: 45, color: Colors.black87),
                     textAlign: TextAlign.center,
                   ),
@@ -146,7 +160,7 @@ class HotelBookingPage extends StatelessWidget {
                     ),
                   ),
 
-                  // Slider Section
+                  // Slider
                   Container(
                     width: double.infinity,
                     color: Colors.grey[100],
@@ -162,7 +176,7 @@ class HotelBookingPage extends StatelessWidget {
                             borderRadius: BorderRadius.circular(2),
                           ),
                         ),
-                        _RoomSlider(rooms: rooms),
+                        _HotelSlider(hotels: hotels),
                         Padding(
                           padding: const EdgeInsets.only(top: 50),
                           child: Column(
@@ -176,7 +190,7 @@ class HotelBookingPage extends StatelessWidget {
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) =>
-                                            AllRoomsPage(rooms: rooms),
+                                            AllHotelsPage(hotels: hotels),
                                       ),
                                     );
                                   },
@@ -184,7 +198,7 @@ class HotelBookingPage extends StatelessWidget {
                                     mainAxisSize: MainAxisSize.min,
                                     children: const [
                                       Text(
-                                        'VIEW ALL ROOMS',
+                                        'VIEW ALL HOTELS',
                                         style: TextStyle(
                                           fontSize: 12,
                                           letterSpacing: 2,
@@ -216,7 +230,6 @@ class HotelBookingPage extends StatelessWidget {
                   ),
 
                   const SizedBox(height: 40),
-
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 40),
@@ -232,19 +245,16 @@ class HotelBookingPage extends StatelessWidget {
   }
 }
 
-// =============================
-// RoomSlider: scroll từng item, hiển thị 3 card
-// =============================
-
-class _RoomSlider extends StatefulWidget {
-  final List<Room> rooms;
-  const _RoomSlider({required this.rooms});
+// HotelSlider
+class _HotelSlider extends StatefulWidget {
+  final List<Hotel> hotels;
+  const _HotelSlider({required this.hotels});
 
   @override
-  State<_RoomSlider> createState() => _RoomSliderState();
+  State<_HotelSlider> createState() => _HotelSliderState();
 }
 
-class _RoomSliderState extends State<_RoomSlider> {
+class _HotelSliderState extends State<_HotelSlider> {
   final ScrollController _scrollController = ScrollController();
   int _currentIndex = 0;
   Timer? _timer;
@@ -267,7 +277,7 @@ class _RoomSliderState extends State<_RoomSlider> {
 
   void _startAutoScroll() {
     _timer = Timer.periodic(const Duration(seconds: 4), (_) {
-      if (_currentIndex < widget.rooms.length - 3) {
+      if (_currentIndex < widget.hotels.length - 3) {
         _currentIndex++;
       } else {
         _currentIndex = 0;
@@ -286,7 +296,7 @@ class _RoomSliderState extends State<_RoomSlider> {
   }
 
   void _next() {
-    if (_currentIndex < widget.rooms.length - 3) {
+    if (_currentIndex < widget.hotels.length - 3) {
       setState(() {
         _currentIndex++;
       });
@@ -324,12 +334,12 @@ class _RoomSliderState extends State<_RoomSlider> {
             child: ListView.builder(
               controller: _scrollController,
               scrollDirection: Axis.horizontal,
-              itemCount: widget.rooms.length,
+              itemCount: widget.hotels.length,
               itemBuilder: (context, index) {
                 return Container(
                   width: cardWidth,
                   margin: EdgeInsets.symmetric(horizontal: spacing / 2),
-                  child: RoomCard(room: widget.rooms[index]),
+                  child: HotelCard(hotel: widget.hotels[index]),
                 );
               },
             ),
