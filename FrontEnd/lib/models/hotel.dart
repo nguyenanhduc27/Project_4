@@ -5,6 +5,7 @@ class Hotel {
   final String description;
   final int starRating;
   final String thumbnailUrl;
+  final String city; // Thêm trường city
 
   Hotel({
     required this.id,
@@ -13,6 +14,7 @@ class Hotel {
     required this.description,
     required this.starRating,
     required this.thumbnailUrl,
+    required this.city, // Thêm vào constructor
   });
 
   factory Hotel.fromJson(Map<String, dynamic> json) {
@@ -21,8 +23,9 @@ class Hotel {
       name: json['name'],
       address: json['address'],
       description: json['description'],
-      starRating: json['star_rating'],
-      thumbnailUrl: json['thumbnail_url'],
+      starRating: json['starRating'] ?? json['star_rating'] ?? 0,
+      thumbnailUrl: json['thumbnailUrl'] ?? json['thumbnail_url'] ?? '',
+      city: json['city'] ?? '', // Parse từ json
     );
   }
 }

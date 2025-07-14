@@ -131,88 +131,33 @@ class CustomHeader extends StatelessWidget {
 
           // --- Navigation ---
           Padding(
-            padding: EdgeInsets.only(left: 220, top: 20, bottom: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      TextButton(
-                        onPressed: () {},
-                        child: Text(
-                          'Home',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Color.fromARGB(255, 79, 78, 78),
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 30),
-                      TextButton(
-                        onPressed: () {},
-                        child: Text(
-                          'Pages',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Color.fromARGB(255, 79, 78, 78),
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 30),
-                      TextButton(
-                        onPressed: () {},
-                        child: Text(
-                          'Rooms',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Color.fromARGB(255, 79, 78, 78),
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 30),
-                      TextButton(
-                        onPressed: () {},
-                        child: Text(
-                          'Reservation',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Color.fromARGB(255, 79, 78, 78),
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 30),
-                      TextButton(
-                        onPressed: () {},
-                        child: Text(
-                          'Blog',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Color.fromARGB(255, 79, 78, 78),
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 30),
-                      TextButton(
-                        onPressed: () {},
-                        child: Text(
-                          'Contact',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Color.fromARGB(255, 79, 78, 78),
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ],
+                  // Co giãn phần menu
+                  child: SingleChildScrollView(
+                    // Phòng trường hợp menu dài
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        TextButton(onPressed: () {}, child: Text('Home')),
+                        SizedBox(width: 20),
+                        TextButton(onPressed: () {}, child: Text('Pages')),
+                        SizedBox(width: 20),
+                        TextButton(onPressed: () {}, child: Text('Rooms')),
+                        SizedBox(width: 20),
+                        TextButton(
+                            onPressed: () {}, child: Text('Reservation')),
+                        SizedBox(width: 20),
+                        TextButton(onPressed: () {}, child: Text('Blog')),
+                        SizedBox(width: 20),
+                        TextButton(onPressed: () {}, child: Text('Contact')),
+                      ],
+                    ),
                   ),
                 ),
-                // Button BOOK NOW bên phải
                 ElevatedButton(
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
@@ -223,7 +168,7 @@ class CustomHeader extends StatelessWidget {
                 ),
               ],
             ),
-          ),
+          )
         ],
       ),
     );

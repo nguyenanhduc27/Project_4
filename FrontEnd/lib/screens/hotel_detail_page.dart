@@ -640,15 +640,18 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
                             GestureDetector(
                               onTap: _showMapPopup,
                               child: Row(
-                                children: const [
-                                  Icon(Icons.location_on,
+                                children: [
+                                  const Icon(Icons.location_on,
                                       color: Colors.blueAccent),
-                                  SizedBox(width: 4),
+                                  const SizedBox(width: 4),
                                   Expanded(
                                     child: Text(
-                                      'Tòa nhà APTECH, 285 P. Đội Cấn, Liễu Giai, Ba Đình, Hà Nội 100000',
+                                      // Nếu Hotel có trường city thì dùng, nếu không thì lấy từ address
+                                      widget.hotel is Hotel && (widget.hotel as dynamic).city != null
+                                        ? (widget.hotel as dynamic).city
+                                        : widget.hotel.address,
                                       style:
-                                          TextStyle(color: Colors.blueAccent),
+                                          const TextStyle(color: Colors.blueAccent),
                                     ),
                                   ),
                                 ],

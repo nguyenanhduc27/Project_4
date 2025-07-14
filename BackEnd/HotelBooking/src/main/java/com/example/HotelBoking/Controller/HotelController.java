@@ -9,10 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/hotels")
+@RequestMapping(value = "/api/hotels", produces = "application/json; charset=UTF-8")
 public class HotelController {
 
     @Autowired
@@ -51,5 +52,16 @@ public class HotelController {
     @GetMapping("/{hotelId}/rooms")
     public List<Room> getRoomsByHotel(@PathVariable Long hotelId) {
         return roomService.getRoomsByHotelId(hotelId);
+    }
+
+    @GetMapping(value = "/search", produces = "application/json; charset=UTF-8")
+    public ResponseEntity<List<Hotel>> searchHotels(
+            @RequestParam LocalDate checkIn,
+            @RequestParam LocalDate checkOut,
+            @RequestParam String city,
+            @RequestParam int rooms
+    ) {
+        List<Hotel> hotels = service.searchHotels(checkIn, checkOut, city, rooms);
+        return ResponseEntity.ok(hotels);
     }
 }

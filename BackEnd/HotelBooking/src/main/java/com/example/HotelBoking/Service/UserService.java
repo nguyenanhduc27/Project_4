@@ -26,7 +26,6 @@ public class UserService {
         u.setId(dto.getId());
         u.setFullName(dto.getFullName());
         u.setEmail(dto.getEmail());
-        u.setPassword(dto.getPassword());
         u.setPhone(dto.getPhone());
         return u;
     }
@@ -37,7 +36,6 @@ public class UserService {
         dto.setId(u.getId());
         dto.setFullName(u.getFullName());
         dto.setEmail(u.getEmail());
-        dto.setPassword(u.getPassword());
         dto.setPhone(u.getPhone());
         return dto;
     }

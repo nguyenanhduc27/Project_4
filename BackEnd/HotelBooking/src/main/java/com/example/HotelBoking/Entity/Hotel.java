@@ -3,6 +3,8 @@ package com.example.HotelBoking.Entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 
 @Entity
@@ -17,7 +19,10 @@ public class Hotel {
     private String name;
 
     private String address;
+
+    @Column(name = "city")
     private String city;
+
 
     @Column(columnDefinition = "TEXT")
     private String description;
@@ -25,22 +30,21 @@ public class Hotel {
     @Column(name = "star_rating")
     private Integer starRating;
 
-    @Column(name = "owner_id")
-    private Long ownerId;
-
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    private BigDecimal latitude;
+    private BigDecimal longitude;
+
     public Hotel(){}
 
-    public Hotel(Long id, String name, String address, String city, String description, Integer starRating, Long ownerId, LocalDateTime createdAt) {
+    public Hotel(Long id, String name, String address, String city, String description, Integer starRating, LocalDateTime createdAt) {
         this.id = id;
         this.name = name;
         this.address = address;
         this.city = city;
         this.description = description;
         this.starRating = starRating;
-        this.ownerId = ownerId;
         this.createdAt = createdAt;
     }
 
@@ -82,14 +86,6 @@ public class Hotel {
 
     public void setStarRating(Integer starRating) {
         this.starRating = starRating;
-    }
-
-    public Long getOwnerId() {
-        return ownerId;
-    }
-
-    public void setOwnerId(Long ownerId) {
-        this.ownerId = ownerId;
     }
 
     public LocalDateTime getCreatedAt() {

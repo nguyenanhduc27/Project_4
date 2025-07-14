@@ -19,7 +19,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
   int roomCount = 1;
   int adults = 1;
   int children = 0;
-  String location = '';
+  String city = '';
 
   final LayerLink _roomLink = LayerLink();
   final LayerLink _guestLink = LayerLink();
@@ -84,20 +84,18 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
 
   void _handleSearch() {
     if (_formKey.currentState!.validate()) {
-      // ✅ Gọi callback nếu được truyền từ bên ngoài
       widget.onSearch?.call({
         'checkInDate': checkInDate,
         'checkOutDate': checkOutDate,
         'roomCount': roomCount,
         'adults': adults,
         'children': children,
+        'city': city,
       });
-
-      // (Tuỳ chọn) Thông báo xác nhận
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Searching for $roomCount rooms from ${formatDate(checkInDate)} to ${formatDate(checkOutDate)} for $adults adults and $children children',
+            'Searching for $roomCount rooms from ${formatDate(checkInDate)} to ${formatDate(checkOutDate)} for $adults adults and $children children in $city',
           ),
         ),
       );
@@ -373,21 +371,21 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Location',
+                  const Text('City',
                       style: TextStyle(fontSize: 14, color: Colors.grey)),
                   const SizedBox(height: 6),
                   TextFormField(
                     decoration: InputDecoration(
-                      hintText: 'Enter destination',
+                      hintText: 'Enter city',
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8)),
                       contentPadding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 12),
                     ),
                     validator: (value) => value == null || value.isEmpty
-                        ? 'Please enter a destination'
+                        ? 'Please enter a city'
                         : null,
-                    onChanged: (val) => setState(() => location = val),
+                    onChanged: (val) => setState(() => city = val),
                   ),
                 ],
               ),

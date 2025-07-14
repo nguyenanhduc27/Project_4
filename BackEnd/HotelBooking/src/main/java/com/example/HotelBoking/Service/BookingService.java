@@ -38,9 +38,6 @@ public class BookingService {
             b.setUser(userRepo.findById(dto.getUserId()).orElse(null));
         }
 
-        if (dto.getRoomId() != null) {
-            b.setRoom(roomRepo.findById(dto.getRoomId()).orElse(null));
-        }
 
         return b;
     }
@@ -58,9 +55,6 @@ public class BookingService {
             dto.setUserId(b.getUser().getId());
         }
 
-        if (b.getRoom() != null) {
-            dto.setRoomId(b.getRoom().getId());
-        }
 
         return dto;
     }
@@ -74,10 +68,6 @@ public class BookingService {
     }
 
     public Booking add(BookingDTO dto) {
-        // Check room trùng lịch
-        if (!isRoomAvailable(dto.getRoomId(), dto.getCheckIn(), dto.getCheckOut())) {
-            throw new RuntimeException("Phòng đã được đặt trong khoảng thời gian này!");
-        }
 
         Booking b = toEntity(dto);
         b.setCreatedAt(LocalDateTime.now());
@@ -102,17 +92,7 @@ public class BookingService {
         return false;
     }
 
-    // Kiểm tra phòng có bị trùng lịch không
-    public boolean isRoomAvailable(Long roomId, LocalDate checkIn, LocalDate checkOut) {
-        List<Booking> bookings = repo.findByRoomIdAndStatus(roomId, BookingStatus.Paid);
-        for (Booking b : bookings) {
-            // Nếu có overlap → return false
-            if (!(checkOut.isBefore(b.getCheckIn()) || checkIn.isAfter(b.getCheckOut()))) {
-                return false;
-            }
-        }
-        return true;
-    }
+
 
     public List<Booking> getBookingUser(Long userId) {
         return repo.findByUserId(userId);
@@ -122,8 +102,5 @@ public class BookingService {
         return repo.findByStatus(status);
     }
 
-    public List<Booking> getBookingsByUserAndStatus(Long userId, BookingStatus status) {
-        return repo.findByUserIdAndStatus(userId, status);
-    }
 
 }

@@ -9,6 +9,7 @@ import '../widgets/hotel_card.dart';
 import '../models/hotel.dart';
 import 'all_hotel_pages.dart';
 import 'hotel_search_page.dart';
+import '../services/hotel_service.dart';
 
 class HotelBookingPage extends StatefulWidget {
   const HotelBookingPage({super.key});
@@ -18,57 +19,12 @@ class HotelBookingPage extends StatefulWidget {
 }
 
 class _HotelBookingPageState extends State<HotelBookingPage> {
-  // Dữ liệu khách sạn mẫu
-  final List<Hotel> hotels = [
-    Hotel(
-      id: 1,
-      name: 'Vinpearl Resort',
-      address: 'Nha Trang',
-      description: 'Khu nghỉ dưỡng 5 sao đẳng cấp',
-      starRating: 5,
-      thumbnailUrl: 'images/room1.jpg',
-    ),
-    Hotel(
-      id: 2,
-      name: 'FLC Luxury Hotel',
-      address: 'Quy Nhơn',
-      description: 'Resort biển sang trọng',
-      starRating: 4,
-      thumbnailUrl: 'images/room2.jpg',
-    ),
-    Hotel(
-      id: 2,
-      name: 'FLC Luxury Hotel',
-      address: 'Quy Nhơn',
-      description: 'Resort biển sang trọng',
-      starRating: 4,
-      thumbnailUrl: 'images/room3.jpg',
-    ),
-    Hotel(
-      id: 2,
-      name: 'FLC Luxury Hotel',
-      address: 'Quy Nhơn',
-      description: 'Resort biển sang trọng',
-      starRating: 4,
-      thumbnailUrl: 'images/room4.jpg',
-    ),
-    Hotel(
-      id: 2,
-      name: 'FLC Luxury Hotel',
-      address: 'Quy Nhơn',
-      description: 'Resort biển sang trọng',
-      starRating: 4,
-      thumbnailUrl: 'images/room5.jpg',
-    ),
-    Hotel(
-      id: 2,
-      name: 'FLC Luxury Hotel',
-      address: 'Quy Nhơn',
-      description: 'Resort biển sang trọng',
-      starRating: 4,
-      thumbnailUrl: 'images/room6.jpg',
-    ),
-  ];
+  final HotelService _hotelService = HotelService();
+  List<Hotel> hotels = [];
+  bool isLoading = true;
+  String? error;
+
+  // Đã xóa dữ liệu khách sạn mẫu. Nếu cần, hãy lấy dữ liệu từ API hoặc provider.
 
   @override
   void initState() {
@@ -76,6 +32,26 @@ class _HotelBookingPageState extends State<HotelBookingPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<AuthProvider>(context, listen: false).checkLogin();
     });
+    _fetchHotels();
+  }
+
+  Future<void> _fetchHotels() async {
+    setState(() {
+      isLoading = true;
+      error = null;
+    });
+    try {
+      final result = await _hotelService.fetchHotels();
+      setState(() {
+        hotels = result;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        error = e.toString();
+        isLoading = false;
+      });
+    }
   }
 
   @override
@@ -176,7 +152,13 @@ class _HotelBookingPageState extends State<HotelBookingPage> {
                             borderRadius: BorderRadius.circular(2),
                           ),
                         ),
-                        _HotelSlider(hotels: hotels),
+                        isLoading
+                            ? const Center(child: CircularProgressIndicator())
+                            : error != null
+                                ? Center(child: Text('Lỗi: ' + error!))
+                                : hotels.isEmpty
+                                    ? const Center(child: Text('Không có khách sạn nào'))
+                                    : _HotelSlider(hotels: hotels),
                         Padding(
                           padding: const EdgeInsets.only(top: 50),
                           child: Column(

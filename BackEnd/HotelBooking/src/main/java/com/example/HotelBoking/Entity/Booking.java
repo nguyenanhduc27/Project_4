@@ -21,11 +21,6 @@ public class Booking {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    // Quan hệ N-1 với Room
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "room_id", nullable = false)
-    private Room room;
-
     @Column(name = "check_in")
     private LocalDate checkIn;
 
@@ -44,10 +39,9 @@ public class Booking {
 
     public Booking(){}
 
-    public Booking(Long id, User user, Room room, LocalDate checkIn, LocalDate checkOut, BigDecimal totalPrice, BookingStatus status, LocalDateTime createdAt) {
+    public Booking(Long id, User user, LocalDate checkIn, LocalDate checkOut, BigDecimal totalPrice, BookingStatus status, LocalDateTime createdAt) {
         this.id = id;
         this.user = user;
-        this.room = room;
         this.checkIn = checkIn;
         this.checkOut = checkOut;
         this.totalPrice = totalPrice;
@@ -69,14 +63,6 @@ public class Booking {
 
     public void setUser(User user) {
         this.user = user;
-    }
-
-    public Room getRoom() {
-        return room;
-    }
-
-    public void setRoom(Room room) {
-        this.room = room;
     }
 
     public LocalDate getCheckIn() {

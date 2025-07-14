@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 public class BookingDTO {
     private Long id;
     private Long userId;
-    private Long roomId;
     private LocalDate checkIn;
     private LocalDate checkOut;
     private BigDecimal totalPrice;
@@ -21,10 +20,9 @@ public class BookingDTO {
 
     public BookingDTO(){}
 
-    public BookingDTO(Long id, Long userId, Long roomId, LocalDate checkIn, LocalDate checkOut, BigDecimal totalPrice, BookingStatus status, LocalDateTime createdAt) {
+    public BookingDTO(Long id, Long userId, LocalDate checkIn, LocalDate checkOut, BigDecimal totalPrice, BookingStatus status, LocalDateTime createdAt) {
         this.id = id;
         this.userId = userId;
-        this.roomId = roomId;
         this.checkIn = checkIn;
         this.checkOut = checkOut;
         this.totalPrice = totalPrice;
@@ -46,14 +44,6 @@ public class BookingDTO {
 
     public void setUserId(Long userId) {
         this.userId = userId;
-    }
-
-    public Long getRoomId() {
-        return roomId;
-    }
-
-    public void setRoomId(Long roomId) {
-        this.roomId = roomId;
     }
 
     public LocalDate getCheckIn() {

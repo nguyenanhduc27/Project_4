@@ -4,14 +4,18 @@ import com.example.HotelBoking.DTO.HotelDTO;
 import com.example.HotelBoking.DTO.RoomDTO;
 import com.example.HotelBoking.Entity.Hotel;
 import com.example.HotelBoking.Entity.Room;
+import com.example.HotelBoking.Entity.RoomType;
+import com.example.HotelBoking.Enum.BookingStatus;
 import com.example.HotelBoking.Repository.HotelRepository;
 import com.example.HotelBoking.Repository.RoomRepository;
 import com.example.HotelBoking.Repository.RoomTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class RoomService {
@@ -27,8 +31,8 @@ public class RoomService {
     private RoomDTO toDTO(Room r){
         RoomDTO dto = new RoomDTO();
         dto.setId(r.getId());
-        dto.setHotelId(r.getHotelId());
-        dto.setRoomTypeId(r.getRoomTypeId());
+        dto.setHotelId(r.getHotel().getId());
+        dto.setRoomTypeId(r.getRoomType().getId());
         dto.setRoomNumber(r.getRoomNumber());
         dto.setAvailable(r.getAvailable());
         return dto;
@@ -37,10 +41,14 @@ public class RoomService {
     private Room toEntity(RoomDTO dto){
         Room r = new Room();
         r.setId(dto.getId());
-        r.setHotelId(dto.getHotelId());
-        r.setRoomTypeId(dto.getRoomTypeId());
         r.setRoomNumber(dto.getRoomNumber());
         r.setAvailable(dto.getAvailable());
+        Hotel hotel = hotelRepo.findById(dto.getHotelId()).orElse(null);
+        RoomType roomType = roomTypeRepo.findById(dto.getRoomTypeId()).orElse(null);
+
+        r.setHotel(hotel);
+        r.setRoomType(roomType);
+
         return r;
     }
 

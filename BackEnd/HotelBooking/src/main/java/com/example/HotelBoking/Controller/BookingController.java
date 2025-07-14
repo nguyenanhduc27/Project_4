@@ -57,13 +57,5 @@ public class BookingController {
         return service.getBookingsByStatus(status);
     }
 
-    @GetMapping("/user/{userId}/status")
-    public List<Booking> getBookingsByUserAndStatus(
-            @PathVariable Long userId,
-            @RequestParam BookingStatus status
-    ) {
-        return service.getBookingsByUserAndStatus(userId,status);
-    }
-
 
 }
