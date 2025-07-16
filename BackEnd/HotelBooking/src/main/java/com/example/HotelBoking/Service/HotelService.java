@@ -73,7 +73,7 @@ public class HotelService {
         return repo.findAll();
     }
 
-    public Hotel findById(Long id) {
+    public Hotel findById(Integer id) {
         return repo.findById(id).orElse(null);
     }
 
@@ -83,7 +83,7 @@ public class HotelService {
         return repo.save(h);
     }
 
-    public Hotel update(Long id, HotelDTO dto) {
+    public Hotel update(Integer id, HotelDTO dto) {
         if (repo.existsById(id)) {
             Hotel h = toEntity(dto);
             h.setId(id);
@@ -92,7 +92,7 @@ public class HotelService {
         return null;
     }
 
-    public boolean delete(Long id) {
+    public boolean delete(Integer id) {
         if (repo.existsById(id)) {
             repo.deleteById(id);
             return true;
@@ -114,11 +114,11 @@ public class HotelService {
         List<BookingStatus> statuses = List.of(BookingStatus.PENDING, BookingStatus.Paid);
 
         for (Hotel hotel : hotels) {
-            List<Room> rooms = roomRepository.findByHotelId(hotel.getId());
+            List<Room> rooms = roomRepository.findByHotel_Id(hotel.getId());
             int availableCount = 0;
 
             for (Room room : rooms) {
-                if (!room.getAvailable()) continue;
+                if (!room.getIsAvailable()) continue;
 
                 boolean isBooked = bookingDetailRepository.existsActiveBooking(
                         room.getId(), statuses, checkIn, checkOut

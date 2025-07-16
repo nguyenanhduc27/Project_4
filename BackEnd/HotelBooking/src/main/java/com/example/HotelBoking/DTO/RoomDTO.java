@@ -1,63 +1,27 @@
 package com.example.HotelBoking.DTO;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.util.List;
+import com.example.HotelBoking.DTO.RoomTypeDTO;
+import com.example.HotelBoking.DTO.AmenityDTO;
 
 public class RoomDTO {
-    private Long id;
-    private Long hotelId;
-    private Long roomTypeId;
-    private String roomNumber;
+    private Integer id;
+    private Integer hotelId;
+    private RoomTypeDTO roomType;
     private Boolean isAvailable;
+    private String roomImage;
+    private List<AmenityDTO> amenities;
 
-    public RoomDTO(){}
-
-    public RoomDTO(Long id, Long hotelId, Long roomTypeId, String roomNumber, Boolean isAvailable) {
-        this.id = id;
-        this.hotelId = hotelId;
-        this.roomTypeId = roomTypeId;
-        this.roomNumber = roomNumber;
-        this.isAvailable = isAvailable;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getHotelId() {
-        return hotelId;
-    }
-
-    public void setHotelId(Long hotelId) {
-        this.hotelId = hotelId;
-    }
-
-    public Long getRoomTypeId() {
-        return roomTypeId;
-    }
-
-    public void setRoomTypeId(Long roomTypeId) {
-        this.roomTypeId = roomTypeId;
-    }
-
-    public String getRoomNumber() {
-        return roomNumber;
-    }
-
-    public void setRoomNumber(String roomNumber) {
-        this.roomNumber = roomNumber;
-    }
-
-    public Boolean getAvailable() {
-        return isAvailable;
-    }
-
-    public void setAvailable(Boolean available) {
-        isAvailable = available;
-    }
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
+    public Integer getHotelId() { return hotelId; }
+    public void setHotelId(Integer hotelId) { this.hotelId = hotelId; }
+    public RoomTypeDTO getRoomType() { return roomType; }
+    public void setRoomType(RoomTypeDTO roomType) { this.roomType = roomType; }
+    public Boolean getIsAvailable() { return isAvailable; }
+    public void setIsAvailable(Boolean isAvailable) { this.isAvailable = isAvailable; }
+    public String getRoomImage() { return roomImage; }
+    public void setRoomImage(String roomImage) { this.roomImage = roomImage; }
+    public List<AmenityDTO> getAmenities() { return amenities; }
+    public void setAmenities(List<AmenityDTO> amenities) { this.amenities = amenities; }
 }

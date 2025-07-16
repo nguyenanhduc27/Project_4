@@ -4,10 +4,10 @@ import com.example.HotelBoking.Entity.HotelImage;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-public interface HotelImageRepository extends JpaRepository<HotelImage, Long> {
+public interface HotelImageRepository extends JpaRepository<HotelImage, Integer> {
     @Query("SELECT h.imageUrl FROM HotelImage h WHERE h.hotel.id = :hotelId AND h.isThumbnail = true")
-    String findThumbnailUrlByHotelId(Long hotelId);
+    String findThumbnailUrlByHotelId(Integer hotelId);
 
     @Query("SELECT h FROM HotelImage h WHERE h.hotel.id = :hotelId")
-    java.util.List<HotelImage> findAllByHotelId(Long hotelId);
+    java.util.List<HotelImage> findAllByHotelId(Integer hotelId);
 }

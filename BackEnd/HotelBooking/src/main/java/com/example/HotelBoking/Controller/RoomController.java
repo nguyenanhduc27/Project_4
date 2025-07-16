@@ -1,52 +1,59 @@
 package com.example.HotelBoking.Controller;
 
 import com.example.HotelBoking.DTO.RoomDTO;
-import com.example.HotelBoking.Entity.Room;
 import com.example.HotelBoking.Service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/rooms")
 public class RoomController {
-
     @Autowired
-    private RoomService service;
+    private RoomService roomService;
 
     // Lấy tất cả phòng
     @GetMapping
-    public List<Room> getAllRooms() {
-        return service.getAll();
+    public List<RoomDTO> getAllRooms() {
+        return roomService.getAll();
     }
 
     // Lấy phòng theo ID
     @GetMapping("/{id}")
-    public Room getRoomById(@PathVariable Long id) {
-        return service.findById(id);
+    public ResponseEntity<RoomDTO> getRoomById(@PathVariable Integer id) {
+        RoomDTO dto = roomService.findById(id);
+        if (dto == null) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(dto);
+    }
+
+    // Lấy danh sách phòng theo khách sạn
+    @GetMapping("/hotel/{hotelId}")
+    public List<RoomDTO> getRoomsByHotel(@PathVariable Integer hotelId) {
+        return roomService.getRoomsByHotelId(hotelId);
     }
 
     // Thêm phòng mới
     @PostMapping
-    public Room addNewRoom(@RequestBody RoomDTO dto) {
-        return service.add(dto);
+    public ResponseEntity<RoomDTO> addNewRoom(@RequestBody RoomDTO dto) {
+        RoomDTO created = roomService.add(dto);
+        return ResponseEntity.ok(created);
     }
 
     // Cập nhật phòng
     @PutMapping("/{id}")
-    public Room updateRoom(@PathVariable Long id, @RequestBody RoomDTO dto) {
-        return service.update(id, dto);
+    public ResponseEntity<RoomDTO> updateRoom(@PathVariable Integer id, @RequestBody RoomDTO dto) {
+        RoomDTO updated = roomService.update(id, dto);
+        if (updated == null) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(updated);
     }
 
     // Xóa phòng
     @DeleteMapping("/{id}")
-    public String deleteRoom(@PathVariable Long id) {
-        return service.delete(id) ? "Success Delete" : "Can not find id";
+    public ResponseEntity<?> deleteRoom(@PathVariable Integer id) {
+        boolean deleted = roomService.delete(id);
+        if (deleted) return ResponseEntity.ok().build();
+        return ResponseEntity.notFound().build();
     }
-
-
-
 }

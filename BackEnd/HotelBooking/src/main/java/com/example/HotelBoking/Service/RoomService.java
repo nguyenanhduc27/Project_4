@@ -1,97 +1,127 @@
 package com.example.HotelBoking.Service;
 
-import com.example.HotelBoking.DTO.HotelDTO;
 import com.example.HotelBoking.DTO.RoomDTO;
+import com.example.HotelBoking.DTO.RoomTypeDTO;
+import com.example.HotelBoking.DTO.AmenityDTO;
+import com.example.HotelBoking.Entity.Amenity;
 import com.example.HotelBoking.Entity.Hotel;
 import com.example.HotelBoking.Entity.Room;
 import com.example.HotelBoking.Entity.RoomType;
-import com.example.HotelBoking.Enum.BookingStatus;
+import com.example.HotelBoking.Repository.AmenityRepository;
 import com.example.HotelBoking.Repository.HotelRepository;
 import com.example.HotelBoking.Repository.RoomRepository;
 import com.example.HotelBoking.Repository.RoomTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class RoomService {
     @Autowired
-    private RoomRepository repo;
-
+    private RoomRepository roomRepository;
     @Autowired
-    HotelRepository hotelRepo;
-
+    private HotelRepository hotelRepository;
     @Autowired
-    RoomTypeRepository roomTypeRepo;
+    private RoomTypeRepository roomTypeRepository;
+    @Autowired
+    private AmenityRepository amenityRepository;
 
-    private RoomDTO toDTO(Room r){
+    // Mapping entity -> DTO
+    private RoomDTO toDTO(Room room) {
         RoomDTO dto = new RoomDTO();
-        dto.setId(r.getId());
-        dto.setHotelId(r.getHotel().getId());
-        dto.setRoomTypeId(r.getRoomType().getId());
-        dto.setRoomNumber(r.getRoomNumber());
-        dto.setAvailable(r.getAvailable());
+        dto.setId(room.getId());
+        dto.setHotelId(room.getHotel() != null ? (room.getHotel().getId() != null ? room.getHotel().getId().intValue() : null) : null);
+        dto.setIsAvailable(room.getIsAvailable());
+        dto.setRoomImage(room.getRoomImage());
+        // RoomType
+        if (room.getRoomType() != null) {
+            RoomType type = room.getRoomType();
+            RoomTypeDTO typeDTO = new RoomTypeDTO();
+            typeDTO.setId(type.getId());
+            typeDTO.setName(type.getName());
+            typeDTO.setDescription(type.getDescription());
+            typeDTO.setPrice(type.getPrice());
+            typeDTO.setMaxGuests(type.getMaxGuests());
+            typeDTO.setDoubleBed(type.getDoubleBed());
+            typeDTO.setArea(type.getArea());
+            dto.setRoomType(typeDTO);
+        }
+        // Amenities
+        if (room.getAmenities() != null) {
+            List<AmenityDTO> amenityDTOs = room.getAmenities().stream().map(a -> {
+                AmenityDTO adto = new AmenityDTO();
+                adto.setId(a.getId());
+                adto.setName(a.getName());
+                return adto;
+            }).collect(Collectors.toList());
+            dto.setAmenities(amenityDTOs);
+        }
         return dto;
     }
 
-    private Room toEntity(RoomDTO dto){
-        Room r = new Room();
-        r.setId(dto.getId());
-        r.setRoomNumber(dto.getRoomNumber());
-        r.setAvailable(dto.getAvailable());
-        Hotel hotel = hotelRepo.findById(dto.getHotelId()).orElse(null);
-        RoomType roomType = roomTypeRepo.findById(dto.getRoomTypeId()).orElse(null);
-
-        r.setHotel(hotel);
-        r.setRoomType(roomType);
-
-        return r;
-    }
-
-    public List<Room> getAll(){
-        return repo.findAll();
-    }
-
-    public Room findById(Long id){
-        return repo.findById(id).orElse(null);
-    }
-
-    public Room add(RoomDTO dto) {
-        if (!hotelRepo.existsById(dto.getHotelId())) {
-            throw new RuntimeException("Hotel ID không tồn tại!");
+    // Mapping DTO -> entity
+    private Room toEntity(RoomDTO dto) {
+        Room room = new Room();
+        room.setId(dto.getId());
+        room.setIsAvailable(dto.getIsAvailable());
+        room.setRoomImage(dto.getRoomImage());
+        // Hotel
+        if (dto.getHotelId() != null) {
+            Hotel hotel = hotelRepository.findById((int) dto.getHotelId().longValue()).orElse(null);
+            room.setHotel(hotel);
         }
-
-        // Kiểm tra room_type_id có tồn tại không
-        if (!roomTypeRepo.existsById(dto.getRoomTypeId())) {
-            throw new RuntimeException("Room Type ID không tồn tại!");
+        // RoomType
+        if (dto.getRoomType() != null && dto.getRoomType().getId() != null) {
+            RoomType type = roomTypeRepository.findById(dto.getRoomType().getId()).orElse(null);
+            room.setRoomType(type);
         }
-        Room r = toEntity(dto);
-        return repo.save(r);
+        // Amenities
+        if (dto.getAmenities() != null) {
+            Set<Amenity> amenities = dto.getAmenities().stream()
+                    .map(a -> amenityRepository.findById(a.getId()).orElse(null))
+                    .filter(a -> a != null)
+                    .collect(Collectors.toSet());
+            room.setAmenities(amenities);
+        }
+        return room;
     }
 
-    public Room update(Long id , RoomDTO dto){
-        if(repo.existsById(id)){
-            Room r = toEntity(dto);
-            r.setId(id);
-            return repo.save(r);
+    public List<RoomDTO> getAll() {
+        return roomRepository.findAll().stream().map(this::toDTO).collect(Collectors.toList());
+    }
+
+    public RoomDTO findById(Integer id) {
+        return roomRepository.findById(id).map(this::toDTO).orElse(null);
+    }
+
+    public RoomDTO add(RoomDTO dto) {
+        Room room = toEntity(dto);
+        Room saved = roomRepository.save(room);
+        return toDTO(saved);
+    }
+
+    public RoomDTO update(Integer id, RoomDTO dto) {
+        if (roomRepository.existsById(id)) {
+            Room room = toEntity(dto);
+            room.setId(id);
+            Room saved = roomRepository.save(room);
+            return toDTO(saved);
         }
         return null;
     }
 
-    public boolean delete(Long id){
-        if(repo.existsById(id)){
-            repo.deleteById(id);
+    public boolean delete(Integer id) {
+        if (roomRepository.existsById(id)) {
+            roomRepository.deleteById(id);
             return true;
         }
         return false;
     }
 
-    public List<Room> getRoomsByHotelId(Long hotelId) {
-        return repo.findByHotelId(hotelId);
+    public List<RoomDTO> getRoomsByHotelId(Integer hotelId) {
+        return roomRepository.findByHotel_Id(hotelId).stream().map(this::toDTO).collect(Collectors.toList());
     }
-
 }

@@ -1,8 +1,8 @@
 package com.example.HotelBoking.Controller;
 
 import com.example.HotelBoking.DTO.HotelDTO;
+import com.example.HotelBoking.DTO.RoomDTO;
 import com.example.HotelBoking.Entity.Hotel;
-import com.example.HotelBoking.Entity.Room;
 import com.example.HotelBoking.Service.HotelService;
 import com.example.HotelBoking.Service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,7 @@ public class HotelController {
     }
 
     @GetMapping("/{id}")
-    public Hotel getHotelById(@PathVariable Long id){
+    public Hotel getHotelById(@PathVariable Integer id){
         return service.findById(id);
     }
 
@@ -39,19 +39,19 @@ public class HotelController {
     }
 
     @PutMapping("/{id}")
-    public Hotel updateHotel(@PathVariable Long id , @RequestBody HotelDTO dto){
+    public Hotel updateHotel(@PathVariable Integer id , @RequestBody HotelDTO dto){
         return service.update(id , dto);
     }
 
     @DeleteMapping("/{id}")
-    public String deleteHotel(@PathVariable Long id){
+    public String deleteHotel(@PathVariable Integer id){
         return service.delete(id) ? "Success Delete" : "Can not find id";
     }
 
 
     //  Lấy danh sách phòng theo khách sạn
     @GetMapping("/{hotelId}/rooms")
-    public List<Room> getRoomsByHotel(@PathVariable Long hotelId) {
+    public List<RoomDTO> getRoomsByHotel(@PathVariable Integer hotelId) {
         return roomService.getRoomsByHotelId(hotelId);
     }
 

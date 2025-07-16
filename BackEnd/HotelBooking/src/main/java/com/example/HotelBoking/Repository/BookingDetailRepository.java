@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDate;
 import java.util.List;
 
-public interface BookingDetailRepository extends JpaRepository<BookingDetail, Long> {
+public interface BookingDetailRepository extends JpaRepository<BookingDetail, Integer> {
     @Query("SELECT CASE WHEN COUNT(bd) > 0 THEN true ELSE false END " +
             "FROM BookingDetail bd " +
             "WHERE bd.room.id = :roomId " +
@@ -17,7 +17,7 @@ public interface BookingDetailRepository extends JpaRepository<BookingDetail, Lo
             "AND :checkOut > bd.booking.checkIn " +
             "AND :checkIn < bd.booking.checkOut")
     boolean existsActiveBooking(
-            @Param("roomId") Long roomId,
+            @Param("roomId") Integer roomId,
             @Param("statuses") List<BookingStatus> statuses,
             @Param("checkIn") LocalDate checkIn,
             @Param("checkOut") LocalDate checkOut

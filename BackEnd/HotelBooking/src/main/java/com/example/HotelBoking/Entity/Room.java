@@ -1,78 +1,48 @@
 package com.example.HotelBoking.Entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import java.util.Set;
 
 @Entity
 @Table(name = "rooms")
-
 public class Room {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hotel_id")
     private Hotel hotel;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_type_id")
     private RoomType roomType;
-
-    @Column(name = "room_number")
-    private String roomNumber;
 
     @Column(name = "is_available")
     private Boolean isAvailable;
 
-    public Room(){}
+    @Column(name = "room_image")
+    private String roomImage;
 
-    public Room(Long id, Hotel hotel, RoomType roomType, String roomNumber, Boolean isAvailable) {
-        this.id = id;
-        this.hotel = hotel;
-        this.roomType = roomType;
-        this.roomNumber = roomNumber;
-        this.isAvailable = isAvailable;
-    }
+    @ManyToMany
+    @JoinTable(
+        name = "room_amenities",
+        joinColumns = @JoinColumn(name = "room_id"),
+        inverseJoinColumns = @JoinColumn(name = "amenity_id")
+    )
+    private Set<Amenity> amenities;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public RoomType getRoomType() {
-        return roomType;
-    }
-
-    public void setRoomType(RoomType roomType) {
-        this.roomType = roomType;
-    }
-
-    public String getRoomNumber() {
-        return roomNumber;
-    }
-
-    public void setRoomNumber(String roomNumber) {
-        this.roomNumber = roomNumber;
-    }
-
-    public Boolean getAvailable() {
-        return isAvailable;
-    }
-
-    public void setAvailable(Boolean available) {
-        isAvailable = available;
-    }
-
-    public Hotel getHotel() {
-        return hotel;
-    }
-
-    public void setHotel(Hotel hotel) {
-        this.hotel = hotel;
-    }
+    // Getters and setters
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
+    public Hotel getHotel() { return hotel; }
+    public void setHotel(Hotel hotel) { this.hotel = hotel; }
+    public RoomType getRoomType() { return roomType; }
+    public void setRoomType(RoomType roomType) { this.roomType = roomType; }
+    public Boolean getIsAvailable() { return isAvailable; }
+    public void setIsAvailable(Boolean isAvailable) { this.isAvailable = isAvailable; }
+    public String getRoomImage() { return roomImage; }
+    public void setRoomImage(String roomImage) { this.roomImage = roomImage; }
+    public Set<Amenity> getAmenities() { return amenities; }
+    public void setAmenities(Set<Amenity> amenities) { this.amenities = amenities; }
 }

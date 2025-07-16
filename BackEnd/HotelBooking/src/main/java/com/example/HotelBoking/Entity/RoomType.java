@@ -11,7 +11,7 @@ public class RoomType {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     private String name;
 
@@ -22,9 +22,15 @@ public class RoomType {
     @Column(name = "max_guests")
     private Integer maxGuests;
 
+    @Column(name = "double_bed")
+    private Integer doubleBed;
+
+    @Column(name = "area")
+    private BigDecimal area;
+
     public RoomType(){}
 
-    public RoomType(Long id, String name, String description, BigDecimal price, Integer maxGuests) {
+    public RoomType(Integer id, String name, String description, BigDecimal price, Integer maxGuests) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -32,11 +38,11 @@ public class RoomType {
         this.maxGuests = maxGuests;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -70,5 +76,21 @@ public class RoomType {
 
     public void setMaxGuests(Integer maxGuests) {
         this.maxGuests = maxGuests;
+    }
+
+    public Integer getDoubleBed() {
+        return doubleBed;
+    }
+
+    public void setDoubleBed(Integer doubleBed) {
+        this.doubleBed = doubleBed;
+    }
+
+    public BigDecimal getArea() {
+        return area;
+    }
+
+    public void setArea(BigDecimal area) {
+        this.area = area;
     }
 }
