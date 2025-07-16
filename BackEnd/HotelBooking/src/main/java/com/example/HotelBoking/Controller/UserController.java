@@ -4,46 +4,55 @@ import com.example.HotelBoking.DTO.UserDTO;
 import com.example.HotelBoking.Entity.User;
 import com.example.HotelBoking.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin(origins = "*") // Cho phép frontend truy cập (như Flutter)
 public class UserController {
 
     @Autowired
-    private UserService userService;
+    private UserService service;
 
-    // Lấy danh sách tất cả user (entity)
     @GetMapping
-    public List<User> getAllUsers() {
-        return userService.getAll();
+    public List<UserDTO> getAllUsers() {
+        return service.getAll();
     }
 
-    // Lấy user theo ID
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable Long id) {
-        return userService.findById(id);
+    public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
+        UserDTO dto = service.findById(id);
+        return dto != null ? ResponseEntity.ok(dto) : ResponseEntity.notFound().build();
     }
 
-    // Thêm user mới từ DTO
     @PostMapping
-    public User addUser(@RequestBody UserDTO dto) {
-        return userService.add(dto);
+    public ResponseEntity<?> createUser(@RequestBody UserDTO dto) {
+        try {
+            return ResponseEntity.ok(service.add(dto));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
-    // Cập nhật user theo ID
     @PutMapping("/{id}")
-    public User updateUser(@PathVariable Long id, @RequestBody UserDTO dto) {
-        return userService.update(id, dto);
+    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody UserDTO dto) {
+        try {
+            User updated = service.update(id, dto);
+            return updated != null ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
-    // Xoá user theo ID
     @DeleteMapping("/{id}")
-    public String deleteUser(@PathVariable Long id) {
-        boolean deleted = userService.delete(id);
-        return deleted ? "Xoá thành công!" : "Không tìm thấy user để xoá!";
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+        return service.delete(id)
+                ? ResponseEntity.ok("Deleted successfully")
+                : ResponseEntity.status(404).body("User not found");
     }
 }
+
+

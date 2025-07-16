@@ -4,6 +4,7 @@ import com.example.HotelBoking.DTO.AuthRequest;
 import com.example.HotelBoking.DTO.JwtResponse;
 import com.example.HotelBoking.DTO.OtpRequest;
 import com.example.HotelBoking.DTO.UserDTO;
+import com.example.HotelBoking.Repository.UserRepository;
 import com.example.HotelBoking.Service.CustomUserDetailsService;
 import com.example.HotelBoking.Service.EmailService;
 import com.example.HotelBoking.Service.OtpService;
@@ -16,17 +17,17 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.example.HotelBoking.Entity.User;
 
+import java.time.LocalDateTime;
 
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/login")
 public class AuthController {
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -39,34 +40,43 @@ public class AuthController {
 
     @Autowired private OtpService otpService;
     @Autowired private EmailService emailService;
-
-    // Bước 1: Xác thực tài khoản và gửi OTP
-    @PostMapping("/login-request")
+    @Autowired private UserRepository userRepository;
+    // Bước 1: Gửi OTP đến email nếu tài khoản tồn tại
+    @PostMapping("/request-code")
     public ResponseEntity<?> requestLogin(@RequestBody AuthRequest request) {
         System.out.println("Email đã nhập: " + request.getEmail());
 
-        try {
-            UserDetails user = userDetailsService.loadUserByUsername(request.getEmail());
-        } catch (UsernameNotFoundException e) {
-            return ResponseEntity.status(401).body("Không tìm thấy người dùng với email: " + request.getEmail());
-        }
+        // Kiểm tra email có tồn tại trong hệ thống không (nếu muốn)
+        // UserDetails user = userDetailsService.loadUserByUsername(request.getEmail());
+        // if (user == null) return ResponseEntity.status(404).body("Email không tồn tại!");
 
         String otp = otpService.generateOtp(request.getEmail());
-        emailService.sendOtp(request.getEmail(), otp);
-
-        return ResponseEntity.ok("Mã OTP đã được gửi đến email.");
+        try {
+            emailService.sendOtp(request.getEmail(), otp);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Lỗi gửi email: " + e.getMessage());
+        }
+        return ResponseEntity.ok("Mã OTP đã được gửi đến email. Mã có hiệu lực trong 1 phút.");
     }
 
 
     // Bước 2: Xác thực OTP và trả token
-    @PostMapping("/verify-otp")
+    @PostMapping("/verify-code")
     public ResponseEntity<?> verifyOtp(@RequestBody OtpRequest request) {
         if (!otpService.verifyOtp(request.getEmail(), request.getOtp())) {
             return ResponseEntity.status(401).body("OTP không đúng hoặc đã hết hạn");
         }
+        
+        User user = userRepository.findByEmail(request.getEmail());
+        if (user == null) {
+            user = new User();
+            user.setEmail(request.getEmail());
+            user.setCreatedAt(LocalDateTime.now());
+            userRepository.save(user);
+        }
 
-        UserDetails user = userDetailsService.loadUserByUsername(request.getEmail());
-        String token = jwtUtil.generateToken(user.getUsername());
+        UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
+        String token = jwtUtil.generateToken(userDetails.getUsername());
 
         return ResponseEntity.ok(new JwtResponse(token));
     }

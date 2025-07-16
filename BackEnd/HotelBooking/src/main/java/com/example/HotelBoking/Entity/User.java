@@ -1,8 +1,13 @@
 package com.example.HotelBoking.Entity;
 
+import com.example.HotelBoking.Enum.Role;
 import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Id;
+
+
+
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
 @Table(name = "users")
@@ -18,23 +23,31 @@ public class User {
     @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(nullable = false)
-    private String password;
-
     private String phone;
+
+    @Temporal(TemporalType.DATE)
+    private Date dateOfBirth;
+
+    private String address;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role = Role.User;
+
     public User(){}
 
-    public User(Long id, String fullName, String email, String password, String phone, LocalDateTime createdAt) {
+    public User(Long id, String fullName, String email, String phone, Date dateOfBirth, String address, LocalDateTime createdAt, Role role) {
         this.id = id;
         this.fullName = fullName;
         this.email = email;
-        this.password = password;
         this.phone = phone;
+        this.dateOfBirth = dateOfBirth;
+        this.address = address;
         this.createdAt = createdAt;
+        this.role = role;
     }
 
     public Long getId() {
@@ -61,20 +74,28 @@ public class User {
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public String getPhone() {
         return phone;
     }
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public Date getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(Date dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -84,4 +105,13 @@ public class User {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
 }
+

@@ -2,6 +2,7 @@ package com.example.HotelBoking.Service;
 
 import com.example.HotelBoking.DTO.UserDTO;
 import com.example.HotelBoking.Entity.User;
+import com.example.HotelBoking.Enum.Role;
 import com.example.HotelBoking.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -10,73 +11,74 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
 
     @Autowired
-    private UserRepository repo;
+    private UserRepository userRepo;
 
-    // Chuyển từ DTO sang Entity
-    public User toEntity(UserDTO dto) {
-        User u = new User();
-        u.setId(dto.getId());
-        u.setFullName(dto.getFullName());
-        u.setEmail(dto.getEmail());
-        u.setPassword(dto.getPassword());
-        u.setPhone(dto.getPhone());
-        return u;
-    }
-
-    // Chuyển từ Entity sang DTO
     public UserDTO toDTO(User u) {
         UserDTO dto = new UserDTO();
         dto.setId(u.getId());
         dto.setFullName(u.getFullName());
         dto.setEmail(u.getEmail());
-        dto.setPassword(u.getPassword());
         dto.setPhone(u.getPhone());
+        dto.setRole(u.getRole());
+        dto.setDateOfBirth(u.getDateOfBirth());
+        dto.setAddress(u.getAddress());
+        dto.setCreatedAt(u.getCreatedAt());
         return dto;
     }
 
-    public List<User> getAll() {
-        return repo.findAll();
+    public User toEntity(UserDTO dto) {
+        User u = new User();
+        u.setId(dto.getId());
+        u.setFullName(dto.getFullName());
+        u.setEmail(dto.getEmail());
+        u.setPhone(dto.getPhone());
+        u.setRole(dto.getRole());
+        u.setDateOfBirth(dto.getDateOfBirth());
+        u.setAddress(dto.getAddress());
+        u.setCreatedAt(dto.getCreatedAt());
+        return u;
     }
 
-    // Lấy 1 user theo id
-    public User findById(Long id) {
-        return repo.findById(id).orElse(null);
+    public List<UserDTO> getAll() {
+        return userRepo.findAll().stream().map(this::toDTO).collect(Collectors.toList());
     }
 
-    // Thêm mới user
+    public UserDTO findById(Long id) {
+        return userRepo.findById(id).map(this::toDTO).orElse(null);
+    }
+
     public User add(UserDTO dto) {
         User u = toEntity(dto);
-        u.setId(null);
-        u.setCreatedAt(LocalDateTime.now());
-        return repo.save(u);
+        return userRepo.save(u);
     }
 
-
-    // Cập nhật user
     public User update(Long id, UserDTO dto) {
-        Optional<User> opt = repo.findById(id);
+        Optional<User> opt = userRepo.findById(id);
         if (opt.isPresent()) {
             User u = opt.get();
             u.setFullName(dto.getFullName());
             u.setEmail(dto.getEmail());
             u.setPhone(dto.getPhone());
-            return repo.save(u);
+            u.setRole(dto.getRole());
+            u.setDateOfBirth(dto.getDateOfBirth());
+            u.setAddress(dto.getAddress());
+            u.setCreatedAt(dto.getCreatedAt());
+            return userRepo.save(u);
         }
         return null;
     }
 
-    // Xóa user
     public boolean delete(Long id) {
-        if (repo.existsById(id)) {
-            repo.deleteById(id);
+        if (userRepo.existsById(id)) {
+            userRepo.deleteById(id);
             return true;
         }
         return false;
     }
-
 }

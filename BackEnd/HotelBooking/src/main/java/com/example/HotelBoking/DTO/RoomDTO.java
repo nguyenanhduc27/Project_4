@@ -9,16 +9,16 @@ public class RoomDTO {
     private Long hotelId;
     private Long roomTypeId;
     private String roomNumber;
-    private Boolean isAvailable;
+    private Boolean available;
 
     public RoomDTO(){}
 
-    public RoomDTO(Long id, Long hotelId, Long roomTypeId, String roomNumber, Boolean isAvailable) {
+    public RoomDTO(Long id, Long hotelId, Long roomTypeId, String roomNumber, Boolean available) {
         this.id = id;
         this.hotelId = hotelId;
         this.roomTypeId = roomTypeId;
         this.roomNumber = roomNumber;
-        this.isAvailable = isAvailable;
+        this.available = available;
     }
 
     public Long getId() {
@@ -54,10 +54,10 @@ public class RoomDTO {
     }
 
     public Boolean getAvailable() {
-        return isAvailable;
+        return available;
     }
 
     public void setAvailable(Boolean available) {
-        isAvailable = available;
+        this.available = available;
     }
 }

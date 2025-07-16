@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 
@@ -14,20 +15,24 @@ public class HotelDTO {
     private String city;
     private String description;
     private Integer starRating;
-    private Long ownerId;
     private LocalDateTime createdAt;
+
+    private BigDecimal latitude;
+
+    private BigDecimal longitude;
 
     public HotelDTO(){}
 
-    public HotelDTO(Long id, String name, String address, String city, String description, Integer starRating, Long ownerId, LocalDateTime createdAt) {
+    public HotelDTO(Long id, String name, String address, String city, String description, Integer starRating, LocalDateTime createdAt, BigDecimal latitude, BigDecimal longitude) {
         this.id = id;
         this.name = name;
         this.address = address;
         this.city = city;
         this.description = description;
         this.starRating = starRating;
-        this.ownerId = ownerId;
         this.createdAt = createdAt;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
     public Long getId() {
@@ -78,19 +83,27 @@ public class HotelDTO {
         this.starRating = starRating;
     }
 
-    public Long getOwnerId() {
-        return ownerId;
-    }
-
-    public void setOwnerId(Long ownerId) {
-        this.ownerId = ownerId;
-    }
-
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public BigDecimal getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(BigDecimal latitude) {
+        this.latitude = latitude;
+    }
+
+    public BigDecimal getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(BigDecimal longitude) {
+        this.longitude = longitude;
     }
 }

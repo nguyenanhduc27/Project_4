@@ -4,86 +4,111 @@ import com.example.HotelBoking.DTO.HotelDTO;
 import com.example.HotelBoking.DTO.RoomDTO;
 import com.example.HotelBoking.Entity.Hotel;
 import com.example.HotelBoking.Entity.Room;
+import com.example.HotelBoking.Entity.RoomType;
+import com.example.HotelBoking.Enum.BookingStatus;
 import com.example.HotelBoking.Repository.HotelRepository;
 import com.example.HotelBoking.Repository.RoomRepository;
 import com.example.HotelBoking.Repository.RoomTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class RoomService {
+
     @Autowired
     private RoomRepository repo;
 
     @Autowired
-    HotelRepository hotelRepo;
+    private HotelRepository hotelRepo;
 
     @Autowired
-    RoomTypeRepository roomTypeRepo;
+    private RoomTypeRepository roomTypeRepo;
 
-    private RoomDTO toDTO(Room r){
+    public RoomDTO toDTO(Room r) {
         RoomDTO dto = new RoomDTO();
         dto.setId(r.getId());
-        dto.setHotelId(r.getHotelId());
-        dto.setRoomTypeId(r.getRoomTypeId());
+        dto.setHotelId(r.getHotel().getId());
+        dto.setRoomTypeId(r.getRoomType().getId());
         dto.setRoomNumber(r.getRoomNumber());
-        dto.setAvailable(r.getAvailable());
+        dto.setAvailable(r.getIsAvailable());
         return dto;
     }
 
-    private Room toEntity(RoomDTO dto){
+    public Room toEntity(RoomDTO dto) {
         Room r = new Room();
         r.setId(dto.getId());
-        r.setHotelId(dto.getHotelId());
-        r.setRoomTypeId(dto.getRoomTypeId());
+
+        Hotel hotel = hotelRepo.findById(dto.getHotelId())
+                .orElseThrow(() -> new RuntimeException("Hotel không tồn tại"));
+
+        RoomType roomType = roomTypeRepo.findById(dto.getRoomTypeId())
+                .orElseThrow(() -> new RuntimeException("RoomType không tồn tại"));
+
+        r.setHotel(hotel);
+        r.setRoomType(roomType);
         r.setRoomNumber(dto.getRoomNumber());
-        r.setAvailable(dto.getAvailable());
+        r.setIsAvailable(dto.getAvailable());
+
         return r;
     }
 
-    public List<Room> getAll(){
-        return repo.findAll();
+    public List<RoomDTO> getAll() {
+        return repo.findAll().stream().map(this::toDTO).collect(Collectors.toList());
     }
 
-    public Room findById(Long id){
-        return repo.findById(id).orElse(null);
+    public RoomDTO findById(Long id) {
+        return repo.findById(id).map(this::toDTO).orElse(null);
     }
 
     public Room add(RoomDTO dto) {
-        if (!hotelRepo.existsById(dto.getHotelId())) {
-            throw new RuntimeException("Hotel ID không tồn tại!");
-        }
-
-        // Kiểm tra room_type_id có tồn tại không
-        if (!roomTypeRepo.existsById(dto.getRoomTypeId())) {
-            throw new RuntimeException("Room Type ID không tồn tại!");
-        }
         Room r = toEntity(dto);
         return repo.save(r);
     }
 
-    public Room update(Long id , RoomDTO dto){
-        if(repo.existsById(id)){
-            Room r = toEntity(dto);
-            r.setId(id);
+    public Room update(Long id, RoomDTO dto) {
+        Optional<Room> opt = repo.findById(id);
+        if (opt.isPresent()) {
+            Room r = opt.get();
+
+            if (dto.getHotelId() != null) {
+                Hotel hotel = hotelRepo.findById(dto.getHotelId())
+                        .orElseThrow(() -> new RuntimeException("Hotel không tồn tại"));
+                r.setHotel(hotel);
+            }
+
+            if (dto.getRoomTypeId() != null) {
+                RoomType rt = roomTypeRepo.findById(dto.getRoomTypeId())
+                        .orElseThrow(() -> new RuntimeException("Room Type không tồn tại"));
+                r.setRoomType(rt);
+            }
+
+            if (dto.getRoomNumber() != null)
+                r.setRoomNumber(dto.getRoomNumber());
+
+            if (dto.getAvailable() != null)
+                r.setIsAvailable(dto.getAvailable());
+
             return repo.save(r);
+
         }
         return null;
     }
 
-    public boolean delete(Long id){
-        if(repo.existsById(id)){
+    public boolean delete(Long id) {
+        if (repo.existsById(id)) {
             repo.deleteById(id);
             return true;
         }
         return false;
     }
-
     public List<Room> getRoomsByHotelId(Long hotelId) {
         return repo.findByHotelId(hotelId);
     }
-
 }
+

@@ -12,11 +12,13 @@ public class Room {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "hotel_id")
-    private Long hotelId;
+    @ManyToOne
+    @JoinColumn(name = "hotel_id")
+    private Hotel hotel;
 
-    @Column(name = "room_type_id")
-    private Long roomTypeId;
+    @ManyToOne
+    @JoinColumn(name = "room_type_id")
+    private RoomType roomType;
 
     @Column(name = "room_number")
     private String roomNumber;
@@ -24,16 +26,12 @@ public class Room {
     @Column(name = "is_available")
     private Boolean isAvailable;
 
-    @ManyToOne
-    @JoinColumn(name = "hotel_id", insertable = false, updatable = false)
-    private Hotel hotel;
-
     public Room(){}
 
-    public Room(Long id, Long hotelId, Long roomTypeId, String roomNumber, Boolean isAvailable, Hotel hotel) {
+    public Room(Long id, Hotel hotel, RoomType roomType, String roomNumber, Boolean isAvailable) {
         this.id = id;
-        this.hotelId = hotelId;
-        this.roomTypeId = roomTypeId;
+        this.hotel = hotel;
+        this.roomType = roomType;
         this.roomNumber = roomNumber;
         this.isAvailable = isAvailable;
     }
@@ -46,20 +44,12 @@ public class Room {
         this.id = id;
     }
 
-    public Long getHotelId() {
-        return hotelId;
+    public RoomType getRoomType() {
+        return roomType;
     }
 
-    public void setHotelId(Long hotelId) {
-        this.hotelId = hotelId;
-    }
-
-    public Long getRoomTypeId() {
-        return roomTypeId;
-    }
-
-    public void setRoomTypeId(Long roomTypeId) {
-        this.roomTypeId = roomTypeId;
+    public void setRoomType(RoomType roomType) {
+        this.roomType = roomType;
     }
 
     public String getRoomNumber() {
@@ -70,11 +60,11 @@ public class Room {
         this.roomNumber = roomNumber;
     }
 
-    public Boolean getAvailable() {
+    public Boolean getIsAvailable() {
         return isAvailable;
     }
 
-    public void setAvailable(Boolean available) {
+    public void setIsAvailable(Boolean available) {
         isAvailable = available;
     }
 

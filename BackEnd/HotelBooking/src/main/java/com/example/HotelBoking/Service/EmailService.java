@@ -21,7 +21,7 @@ public class EmailService {
 
             helper.setTo(to);
             helper.setSubject("Mã OTP đăng nhập");
-            helper.setText("Mã OTP của bạn là: <b>" + otp + "</b>", true);
+            helper.setText("Mã OTP của bạn là: <b>" + otp + "</b><br><br>Mã này có hiệu lực trong 1 phút. Vui lòng không chia sẻ mã này với bất kỳ ai.", true);
 
             mailSender.send(message);
         } catch (MessagingException e) {

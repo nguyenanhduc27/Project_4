@@ -1,78 +1,120 @@
 package com.example.HotelBoking.Service;
 
+import com.example.HotelBoking.DTO.BookingDetailDTO;
 import com.example.HotelBoking.DTO.HotelDTO;
 import com.example.HotelBoking.Entity.Hotel;
-import com.example.HotelBoking.Repository.AdminRepository;
+import com.example.HotelBoking.Entity.Room;
+import com.example.HotelBoking.Enum.BookingStatus;
+import com.example.HotelBoking.Repository.BookingDetailRepository;
 import com.example.HotelBoking.Repository.HotelRepository;
+import com.example.HotelBoking.Repository.RoomRepository;
+import com.example.HotelBoking.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class HotelService {
-    @Autowired
-    private HotelRepository repo;
-    @Autowired
-    private AdminRepository adminRepository;
+    @Autowired private HotelRepository repo;
 
+    @Autowired private RoomRepository roomRepository;
+    @Autowired private BookingDetailRepository bookingDetailRepository;
 
-    private HotelDTO toDTO(Hotel h) {
+    public HotelDTO toDTO(Hotel h) {
         HotelDTO dto = new HotelDTO();
         dto.setId(h.getId());
         dto.setName(h.getName());
         dto.setAddress(h.getAddress());
+        dto.setCity(h.getCity());
         dto.setDescription(h.getDescription());
         dto.setStarRating(h.getStarRating());
-        dto.setOwnerId(h.getOwnerId());
         dto.setCreatedAt(h.getCreatedAt());
         return dto;
     }
 
-    private Hotel toEntity(HotelDTO dto) {
+    public Hotel toEntity(HotelDTO dto) {
         Hotel h = new Hotel();
         h.setId(dto.getId());
         h.setName(dto.getName());
         h.setAddress(dto.getAddress());
+        h.setCity(dto.getCity());
         h.setDescription(dto.getDescription());
         h.setStarRating(dto.getStarRating());
-        h.setOwnerId(dto.getOwnerId());
         h.setCreatedAt(dto.getCreatedAt());
         return h;
     }
 
-    public List<Hotel> getAll(){
+    public List<Hotel> getAll() {
         return repo.findAll();
     }
 
-    public Hotel findById(Long id){
+    public Hotel findById(Long id) {
         return repo.findById(id).orElse(null);
     }
 
     public Hotel add(HotelDTO dto) {
-        if (!adminRepository.existsById(dto.getOwnerId())) {
-            throw new RuntimeException("Owner ID không tồn tại!");
-        }
         Hotel h = toEntity(dto);
         h.setCreatedAt(LocalDateTime.now());
         return repo.save(h);
     }
 
-    public Hotel update(Long id , HotelDTO dto){
-        if(repo.existsById(id)){
+    public Hotel update(Long id, HotelDTO dto) {
+        return repo.findById(id).map(existing -> {
             Hotel h = toEntity(dto);
             h.setId(id);
             return repo.save(h);
-        }
-        return null;
+        }).orElse(null);
     }
 
-    public boolean delete(Long id){
-        if(repo.existsById(id)){
+    public boolean delete(Long id) {
+        if (repo.existsById(id)) {
             repo.deleteById(id);
             return true;
         }
         return false;
     }
+
+    public List<Hotel> searchHotels(LocalDate checkIn, LocalDate checkOut, String city, int requiredRoomCount) {
+
+        System.out.println("CheckIn: " + checkIn);
+        System.out.println("CheckOut: " + checkOut);
+        System.out.println("City: " + city);
+        System.out.println("Số lượng phòng cần: " + requiredRoomCount);
+
+        List<Hotel> hotels = repo.findByCity(city);
+        List<Hotel> availableHotels = new ArrayList<>();
+
+        List<BookingStatus> statuses = List.of(BookingStatus.Pending, BookingStatus.Paid);
+
+        for (Hotel hotel : hotels) {
+            List<Room> rooms = roomRepository.findByHotelId(hotel.getId());
+            int availableCount = 0;
+
+            for (Room room : rooms) {
+                if (!room.getIsAvailable()) continue;
+
+                boolean isBooked = bookingDetailRepository.existsActiveBooking(
+                        room.getId(), statuses, checkIn, checkOut
+                );
+
+                if (!isBooked) {
+                    availableCount++;
+                }
+            }
+
+            System.out.println("Hotel: " + hotel.getName() + " => Available rooms: " + availableCount);
+
+            if (availableCount >= requiredRoomCount) {
+                availableHotels.add(hotel);
+            }
+        }
+
+        return availableHotels;
+    }
 }
+
+

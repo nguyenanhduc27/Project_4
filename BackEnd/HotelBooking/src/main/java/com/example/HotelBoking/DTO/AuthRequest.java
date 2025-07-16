@@ -7,7 +7,6 @@ public class AuthRequest {
 
     public AuthRequest(String email) {
         this.email = email;
-
     }
 
     public String getEmail() {
