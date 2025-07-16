@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/api/hotels", produces = "application/json; charset=UTF-8")
@@ -23,8 +24,8 @@ public class HotelController {
     private RoomService roomService;
 
     @GetMapping
-    public List<Hotel> getAllHotels(){
-        return service.getAll();
+    public List<HotelDTO> getAllHotels(){
+        return service.getAllDTOs();
     }
 
     @GetMapping("/{id}")
@@ -55,13 +56,14 @@ public class HotelController {
     }
 
     @GetMapping(value = "/search", produces = "application/json; charset=UTF-8")
-    public ResponseEntity<List<Hotel>> searchHotels(
+    public ResponseEntity<List<HotelDTO>> searchHotels(
             @RequestParam LocalDate checkIn,
             @RequestParam LocalDate checkOut,
             @RequestParam String city,
             @RequestParam int rooms
     ) {
         List<Hotel> hotels = service.searchHotels(checkIn, checkOut, city, rooms);
-        return ResponseEntity.ok(hotels);
+        List<HotelDTO> dtos = hotels.stream().map(h -> service.toDTO(h)).collect(Collectors.toList());
+        return ResponseEntity.ok(dtos);
     }
 }

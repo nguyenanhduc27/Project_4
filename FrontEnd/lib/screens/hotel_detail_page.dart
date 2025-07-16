@@ -8,6 +8,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import '../models/hotel.dart';
 import '../models/room.dart';
+import '../utils/url_helper.dart';
 
 class HotelDetailPage extends StatefulWidget {
   final Hotel hotel;
@@ -411,7 +412,7 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
   }
 
   void _openImageGallery(String selectedImage) {
-    int initialIndex = roomImages.indexOf(selectedImage);
+    int initialIndex = widget.hotel.imageUrls.indexOf(selectedImage);
     if (initialIndex == -1) initialIndex = 0;
 
     showDialog(
@@ -424,12 +425,12 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
             children: [
               PageView.builder(
                 controller: PageController(initialPage: initialIndex),
-                itemCount: roomImages.length,
+                itemCount: widget.hotel.imageUrls.length,
                 itemBuilder: (context, index) {
                   return InteractiveViewer(
                     child: Center(
-                      child: Image.asset(
-                        roomImages[index],
+                      child: Image.network(
+                        widget.hotel.imageUrls[index],
                         fit: BoxFit.contain,
                       ),
                     ),
@@ -587,15 +588,20 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
                                 Expanded(
                                   flex: 2,
                                   child: GestureDetector(
-                                    onTap: () => _openImageGallery(
-                                        widget.hotel.thumbnailUrl),
+                                    onTap: () => _openImageGallery(widget.hotel.imageUrls.isNotEmpty ? widget.hotel.imageUrls[0] : ''),
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(12),
-                                      child: Image.asset(
-                                        widget.hotel.thumbnailUrl,
-                                        height: 300,
-                                        fit: BoxFit.cover,
-                                      ),
+                                      child: widget.hotel.imageUrls.isNotEmpty
+                                          ? Image.network(
+                                              widget.hotel.imageUrls[0],
+                                              height: 300,
+                                              fit: BoxFit.cover,
+                                            )
+                                          : Image.asset(
+                                              'images/resort-title-bg.jpg',
+                                              height: 300,
+                                              fit: BoxFit.cover,
+                                            ),
                                     ),
                                   ),
                                 ),
@@ -606,25 +612,45 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
                                     children: [
                                       Row(
                                         children: [
-                                          Expanded(
-                                              child: _smallImage(
-                                                  'images/room2.jpg')),
-                                          const SizedBox(width: 8),
-                                          Expanded(
-                                              child: _smallImage(
-                                                  'images/room3.jpg')),
+                                          for (int i = 1; i < (widget.hotel.imageUrls.length > 3 ? 3 : widget.hotel.imageUrls.length); i++)
+                                            Expanded(
+                                              child: GestureDetector(
+                                                onTap: () => _openImageGallery(widget.hotel.imageUrls[i]),
+                                                child: ClipRRect(
+                                                  borderRadius: BorderRadius.circular(8),
+                                                  child: Image.network(
+                                                    widget.hotel.imageUrls[i],
+                                                    height: 146,
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          if (widget.hotel.imageUrls.length < 3)
+                                            for (int i = widget.hotel.imageUrls.length; i < 3; i++)
+                                              Expanded(child: SizedBox()),
                                         ],
                                       ),
                                       const SizedBox(height: 8),
                                       Row(
                                         children: [
-                                          Expanded(
-                                              child: _smallImage(
-                                                  'images/room4.jpg')),
-                                          const SizedBox(width: 8),
-                                          Expanded(
-                                              child: _smallImage(
-                                                  'images/room5.jpg')),
+                                          for (int i = 3; i < (widget.hotel.imageUrls.length > 5 ? 5 : widget.hotel.imageUrls.length); i++)
+                                            Expanded(
+                                              child: GestureDetector(
+                                                onTap: () => _openImageGallery(widget.hotel.imageUrls[i]),
+                                                child: ClipRRect(
+                                                  borderRadius: BorderRadius.circular(8),
+                                                  child: Image.network(
+                                                    widget.hotel.imageUrls[i],
+                                                    height: 146,
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          if (widget.hotel.imageUrls.length < 5)
+                                            for (int i = widget.hotel.imageUrls.length; i < 5; i++)
+                                              Expanded(child: SizedBox()),
                                         ],
                                       ),
                                     ],
@@ -646,10 +672,7 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
                                   const SizedBox(width: 4),
                                   Expanded(
                                     child: Text(
-                                      // Nếu Hotel có trường city thì dùng, nếu không thì lấy từ address
-                                      widget.hotel is Hotel && (widget.hotel as dynamic).city != null
-                                        ? (widget.hotel as dynamic).city
-                                        : widget.hotel.address,
+                                      widget.hotel.city.isNotEmpty ? widget.hotel.city : widget.hotel.address,
                                       style:
                                           const TextStyle(color: Colors.blueAccent),
                                     ),
@@ -658,36 +681,18 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
                               ),
                             ),
                             const SizedBox(height: 30),
-                            const Text(
-                              'Far far away, behind the word mountains...',
-                              style: TextStyle(fontSize: 16, height: 1.6),
-                            ),
+                            Text(widget.hotel.description, style: TextStyle(fontSize: 16, height: 1.6)),
                             const SizedBox(height: 20),
-                            const Text(
-                              'The Big Oxmox advised her not to do so...',
-                              style: TextStyle(fontSize: 16, height: 1.6),
-                            ),
+                            Row(
+  children: List.generate(5, (index) {
+    return Icon(
+      index < widget.hotel.starRating ? Icons.star : Icons.star_border,
+      color: Colors.amber,
+      size: 22,
+    );
+  }),
+),
                             const SizedBox(height: 40),
-                            const Divider(),
-                            const Text('Room Amenities',
-                                style: TextStyle(
-                                    fontSize: 20, fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 20),
-                            Wrap(
-                              spacing: 16,
-                              runSpacing: 16,
-                              children: [
-                                _amenityItem(Icons.tv, 'TV'),
-                                _amenityItem(Icons.wifi, 'Free Wifi'),
-                                _amenityItem(Icons.security, 'Safe'),
-                                _amenityItem(Icons.smoke_free, 'Non Smoking'),
-                                _amenityItem(Icons.ac_unit, 'Air Conditioning'),
-                                _amenityItem(Icons.blur_on, 'Heater'),
-                                _amenityItem(Icons.phone, 'Phone'),
-                                _amenityItem(Icons.bathroom, 'Hair Dryer'),
-                              ],
-                            ),
-                            const SizedBox(height: 30),
                             const Divider(),
                             const Text('Hotel Amenities',
                                 style: TextStyle(
@@ -698,30 +703,17 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
                               runSpacing: 16,
                               children: [
                                 _hotelAmenityItem(Icons.fitness_center, 'Gym'),
-                                _hotelAmenityItem(
-                                    Icons.local_parking, 'Parking'),
+                                _hotelAmenityItem(Icons.local_parking, 'Parking'),
                                 _hotelAmenityItem(Icons.spa, 'Spa'),
-                                _hotelAmenityItem(
-                                    Icons.restaurant, 'Restaurant'),
-                                _hotelAmenityItem(
-                                    Icons.room_service, 'Room Service'),
+                                _hotelAmenityItem(Icons.restaurant, 'Restaurant'),
+                                _hotelAmenityItem(Icons.room_service, 'Room Service'),
                                 _hotelAmenityItem(Icons.pool, 'Swimming Pool'),
-                                _hotelAmenityItem(
-                                    Icons.support_agent, '24 Hour Concierge'),
-                                _hotelAmenityItem(Icons.local_laundry_service,
-                                    'Inhouse Laundry'),
+                                _hotelAmenityItem(Icons.support_agent, '24 Hour Concierge'),
+                                _hotelAmenityItem(Icons.local_laundry_service, 'Inhouse Laundry'),
                               ],
                             ),
                             const SizedBox(height: 40),
                             const Divider(),
-                            const Text('Hotel Rules',
-                                style: TextStyle(
-                                    fontSize: 20, fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 20),
-                            _ruleItem('Smoking not allowed'),
-                            _ruleItem('Pets not allowed'),
-                            _ruleItem(
-                                'Swimming pool closed from 8.00pm - 6.00am'),
                           ],
                         ),
                       ),

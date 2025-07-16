@@ -37,7 +37,7 @@ public class HotelService {
     private HotelImageRepository hotelImageRepository;
 
 
-    private HotelDTO toDTO(Hotel h) {
+    public HotelDTO toDTO(Hotel h) {
         HotelDTO dto = new HotelDTO();
         dto.setId(h.getId());
         dto.setName(h.getName());
@@ -46,9 +46,14 @@ public class HotelService {
         dto.setDescription(h.getDescription());
         dto.setStarRating(h.getStarRating());
         dto.setCreatedAt(h.getCreatedAt());
-        // Lấy thumbnail
         String thumbnailUrl = hotelImageRepository.findThumbnailUrlByHotelId(h.getId());
         dto.setThumbnailUrl(thumbnailUrl);
+        // Lấy danh sách tất cả ảnh
+        List<String> imageUrls = hotelImageRepository.findAllByHotelId(h.getId())
+            .stream()
+            .map(img -> img.getImageUrl())
+            .collect(java.util.stream.Collectors.toList());
+        dto.setImageUrls(imageUrls);
         return dto;
     }
 
@@ -132,6 +137,15 @@ public class HotelService {
         }
 
         return availableHotels;
+    }
+
+    public List<HotelDTO> getAllDTOs() {
+        List<Hotel> hotels = repo.findAll();
+        List<HotelDTO> dtos = new ArrayList<>();
+        for (Hotel h : hotels) {
+            dtos.add(toDTO(h));
+        }
+        return dtos;
     }
 }
 

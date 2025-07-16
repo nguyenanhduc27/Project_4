@@ -102,6 +102,7 @@ class _HotelBookingPageState extends State<HotelBookingPage> {
                                       roomCount: params['roomCount'],
                                       adults: params['adults'],
                                       children: params['children'],
+                                      city: params['city'], // truyền thêm city
                                     ),
                                   ),
                                 );

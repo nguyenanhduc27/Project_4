@@ -19,15 +19,6 @@ public class HotelImage {
     @Column(name = "is_thumbnail")
     private Boolean isThumbnail;
 
-    public HotelImage() {}
-
-    public HotelImage(Long id, Hotel hotel, String imageUrl, Boolean isThumbnail) {
-        this.id = id;
-        this.hotel = hotel;
-        this.imageUrl = imageUrl;
-        this.isThumbnail = isThumbnail;
-    }
-
     public Long getId() {
         return id;
     }
@@ -39,6 +30,7 @@ public class HotelImage {
     public Hotel getHotel() {
         return hotel;
     }
+
     public void setHotel(Hotel hotel) {
         this.hotel = hotel;
     }
@@ -51,12 +43,11 @@ public class HotelImage {
         this.imageUrl = imageUrl;
     }
 
-    public Boolean getIsThumbnail() {
+    public Boolean getThumbnail() {
         return isThumbnail;
     }
 
-    public void setIsThumbnail(Boolean isThumbnail) {
-        this.isThumbnail = isThumbnail;
+    public void setThumbnail(Boolean thumbnail) {
+        isThumbnail = thumbnail;
     }
 }
-

@@ -9,12 +9,15 @@ class HotelService {
   Future<List<Hotel>> fetchHotels() async {
     final url = Uri.parse('$_baseUrl/hotels');
     final token = await AuthService().getToken();
+    final headers = {
+      'Content-Type': 'application/json',
+    };
+    if (token != null) {
+      headers['Authorization'] = 'Bearer $token';
+    }
     final response = await http.get(
       url,
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
+      headers: headers,
     );
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
@@ -38,12 +41,15 @@ class HotelService {
       '&city=$city'
       '&rooms=$rooms'
     );
+    final headers = {
+      'Content-Type': 'application/json',
+    };
+    if (token != null) {
+      headers['Authorization'] = 'Bearer $token';
+    }
     final response = await http.get(
       url,
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
+      headers: headers,
     );
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);

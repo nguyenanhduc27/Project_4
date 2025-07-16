@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 public class HotelDTO {
@@ -23,19 +24,11 @@ public class HotelDTO {
 
     private String thumbnailUrl;
 
+    private List<String> imageUrls;
+
     public HotelDTO(){}
 
-    public HotelDTO(Long id, String name, String address, String city, String description, Integer starRating, LocalDateTime createdAt, BigDecimal latitude, BigDecimal longitude) {
-        this.id = id;
-        this.name = name;
-        this.address = address;
-        this.city = city;
-        this.description = description;
-        this.starRating = starRating;
-        this.createdAt = createdAt;
-        this.latitude = latitude;
-        this.longitude = longitude;
-    }
+    
 
     public Long getId() {
         return id;
@@ -112,7 +105,16 @@ public class HotelDTO {
     public String getThumbnailUrl() {
         return thumbnailUrl;
     }
+
     public void setThumbnailUrl(String thumbnailUrl) {
         this.thumbnailUrl = thumbnailUrl;
+    }
+
+    public List<String> getImageUrls() {
+        return imageUrls;
+    }
+
+    public void setImageUrls(List<String> imageUrls) {
+        this.imageUrls = imageUrls;
     }
 }

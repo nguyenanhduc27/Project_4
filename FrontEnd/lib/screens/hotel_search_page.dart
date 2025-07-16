@@ -5,6 +5,7 @@ import '../widgets/custom_header.dart';
 import '../widgets/custom_footer.dart';
 import 'hotel_detail_page.dart';
 import '../services/hotel_service.dart';
+import '../utils/url_helper.dart';
 
 // Đổi từ StatelessWidget sang StatefulWidget
 class HotelSearchPage extends StatefulWidget {
@@ -13,6 +14,7 @@ class HotelSearchPage extends StatefulWidget {
   final int roomCount;
   final int adults;
   final int children;
+  final String city; // thêm city
 
   const HotelSearchPage({
     super.key,
@@ -21,6 +23,7 @@ class HotelSearchPage extends StatefulWidget {
     required this.roomCount,
     required this.adults,
     required this.children,
+    required this.city, // thêm city
   });
 
   @override
@@ -37,7 +40,12 @@ class _HotelSearchPageState extends State<HotelSearchPage> {
   @override
   void initState() {
     super.initState();
-    _fetchHotels();
+    _onSearch({
+      'city': widget.city,
+      'checkInDate': widget.checkInDate,
+      'checkOutDate': widget.checkOutDate,
+      'roomCount': widget.roomCount,
+    });
   }
 
   Future<void> _fetchHotels() async {
@@ -200,11 +208,12 @@ class _HotelSearchPageState extends State<HotelSearchPage> {
                                                   // Image
                                                   ClipRRect(
                                                     borderRadius: BorderRadius.circular(8),
-                                                    child: Image.asset(
-                                                      hotel.thumbnailUrl,
+                                                    child: Image.network(
+                                                      UrlHelper.normalizeImageUrl(hotel.thumbnailUrl) ?? 'https://via.placeholder.com/250x170', // hoặc ảnh mặc định
                                                       width: 250,
                                                       height: 170,
                                                       fit: BoxFit.cover,
+                                                      errorBuilder: (context, error, stackTrace) => Image.asset('assets/images/default.jpg'),
                                                     ),
                                                   ),
                                                   const SizedBox(width: 24),
@@ -228,8 +237,6 @@ class _HotelSearchPageState extends State<HotelSearchPage> {
                                                             Text(hotel.address),
                                                           ],
                                                         ),
-                                                        const SizedBox(height: 8),
-                                                        Text(hotel.description),
                                                         const SizedBox(height: 8),
                                                         Row(
                                                           children: List.generate(5, (index) {
