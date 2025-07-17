@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,7 +53,9 @@ public class HotelController {
     //  Lấy danh sách phòng theo khách sạn
     @GetMapping("/{hotelId}/rooms")
     public List<RoomDTO> getRoomsByHotel(@PathVariable Integer hotelId) {
-        return roomService.getRoomsByHotelId(hotelId);
+        LocalDate now = LocalDate.now();
+        LocalDate tomorrow = now.plusDays(1);
+        return roomService.getRoomsByHotelId(hotelId, now, tomorrow);
     }
 
     @GetMapping(value = "/search", produces = "application/json; charset=UTF-8")

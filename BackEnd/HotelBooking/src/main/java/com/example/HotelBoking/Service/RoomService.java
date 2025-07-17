@@ -12,6 +12,7 @@ import com.example.HotelBoking.Repository.RoomTypeAmenityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -29,7 +30,7 @@ public class RoomService {
     // Removed AmenityRepository
 
     // Mapping entity -> DTO
-    private RoomDTO toDTO(Room room) {
+    private RoomDTO toDTO(Room room, LocalDate checkIn, LocalDate checkOut) {
         RoomDTO dto = new RoomDTO();
         dto.setId(room.getId());
         dto.setHotelId(room.getHotel() != null ? (room.getHotel().getId() != null ? room.getHotel().getId().intValue() : null) : null);
@@ -48,6 +49,9 @@ public class RoomService {
             typeDTO.setRoomImage(type.getRoomImage());
             // Lấy amenities từ bảng room_types_amenities
             typeDTO.setAmenities(roomTypeAmenityRepository.findAmenityNamesByRoomTypeId(type.getId()));
+            // Tính số phòng còn trống
+            int available = roomRepository.countAvailableRooms(type.getId(), room.getHotel().getId(), checkIn, checkOut);
+            typeDTO.setAvailableRooms(available);
             dto.setRoomType(typeDTO);
         }
         // Removed amenities mapping
@@ -73,17 +77,23 @@ public class RoomService {
     }
 
     public List<RoomDTO> getAll() {
-        return roomRepository.findAll().stream().map(this::toDTO).collect(Collectors.toList());
+        LocalDate now = LocalDate.now();
+        LocalDate tomorrow = now.plusDays(1);
+        return roomRepository.findAll().stream().map(room -> toDTO(room, now, tomorrow)).collect(Collectors.toList());
     }
 
     public RoomDTO findById(Integer id) {
-        return roomRepository.findById(id).map(this::toDTO).orElse(null);
+        LocalDate now = LocalDate.now();
+        LocalDate tomorrow = now.plusDays(1);
+        return roomRepository.findById(id).map(room -> toDTO(room, now, tomorrow)).orElse(null);
     }
 
     public RoomDTO add(RoomDTO dto) {
         Room room = toEntity(dto);
         Room saved = roomRepository.save(room);
-        return toDTO(saved);
+        LocalDate now = LocalDate.now();
+        LocalDate tomorrow = now.plusDays(1);
+        return toDTO(saved, now, tomorrow);
     }
 
     public RoomDTO update(Integer id, RoomDTO dto) {
@@ -91,7 +101,9 @@ public class RoomService {
             Room room = toEntity(dto);
             room.setId(id);
             Room saved = roomRepository.save(room);
-            return toDTO(saved);
+            LocalDate now = LocalDate.now();
+            LocalDate tomorrow = now.plusDays(1);
+            return toDTO(saved, now, tomorrow);
         }
         return null;
     }
@@ -104,7 +116,7 @@ public class RoomService {
         return false;
     }
 
-    public List<RoomDTO> getRoomsByHotelId(Integer hotelId) {
-        return roomRepository.findByHotel_Id(hotelId).stream().map(this::toDTO).collect(Collectors.toList());
+    public List<RoomDTO> getRoomsByHotelId(Integer hotelId, LocalDate checkIn, LocalDate checkOut) {
+        return roomRepository.findByHotel_Id(hotelId).stream().map(room -> toDTO(room, checkIn, checkOut)).collect(Collectors.toList());
     }
 }

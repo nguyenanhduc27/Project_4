@@ -11,6 +11,7 @@ import '../models/room.dart';
 import '../utils/url_helper.dart';
 import '../services/hotel_service.dart';
 import '../widgets/room_list.dart';
+import 'package:intl/intl.dart';
 
 class HotelDetailPage extends StatefulWidget {
   final Hotel hotel;
@@ -358,7 +359,10 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
       roomsError = null;
     });
     try {
-      final result = await _hotelService.fetchRoomsByHotelId(widget.hotel.id);
+      final now = DateTime.now();
+      final checkIn = DateFormat('yyyy-MM-dd').format(now);
+      final checkOut = DateFormat('yyyy-MM-dd').format(now.add(Duration(days: 1)));
+      final result = await _hotelService.fetchRoomsByHotelId(widget.hotel.id, checkIn: checkIn, checkOut: checkOut);
       setState(() {
         rooms = result;
         isLoadingRooms = false;

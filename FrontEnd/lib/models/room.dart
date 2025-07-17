@@ -9,6 +9,7 @@ class RoomType {
   final bool? isAvailable;
   final String? roomImage;
   final List<String> amenities;
+  final int availableRooms;
 
   RoomType({
     required this.id,
@@ -21,6 +22,7 @@ class RoomType {
     this.isAvailable,
     this.roomImage,
     required this.amenities,
+    this.availableRooms = 0,
   });
 
   factory RoomType.fromJson(Map<String, dynamic> json) {
@@ -35,6 +37,7 @@ class RoomType {
       isAvailable: json['isAvailable'],
       roomImage: json['roomImage'],
       amenities: (json['amenities'] as List<dynamic>? ?? []).cast<String>(),
+      availableRooms: json['availableRooms'] ?? 0,
     );
   }
 }

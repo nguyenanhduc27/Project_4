@@ -180,7 +180,7 @@ class _RoomListWidgetState extends State<RoomListWidget> {
       return Center(
         child: Column(
           children: [
-            Text('Lỗi: ${widget.error}'),
+            Text('Lỗi:  [38;5;9m${widget.error} [0m'),
             if (widget.onRetry != null)
               ElevatedButton(
                 onPressed: widget.onRetry,
@@ -194,6 +194,15 @@ class _RoomListWidgetState extends State<RoomListWidget> {
         child: Text('Không có phòng nào cho khách sạn này'),
       );
     }
+    // Group rooms by roomType.id, chỉ lấy 1 room đại diện cho mỗi loại phòng
+    final Map<int, Room> uniqueRoomTypes = {};
+    for (var room in widget.rooms) {
+      final roomType = room.roomType;
+      if (roomType != null && !uniqueRoomTypes.containsKey(roomType.id)) {
+        uniqueRoomTypes[roomType.id] = room;
+      }
+    }
+    final List<Room> displayRooms = uniqueRoomTypes.values.toList();
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -201,7 +210,7 @@ class _RoomListWidgetState extends State<RoomListWidget> {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
-        children: widget.rooms.asMap().entries.map((entry) {
+        children: displayRooms.asMap().entries.map((entry) {
           final index = entry.key;
           final room = entry.value;
           final roomType = room.roomType;
@@ -327,12 +336,12 @@ class _RoomListWidgetState extends State<RoomListWidget> {
                         children: [
                           DropdownButton<int>(
                             value: 1,
-                            items: [1, 2, 3, 4, 5].map((value) {
-                              return DropdownMenuItem<int>(
-                                value: value,
-                                child: Text('$value phòng'),
-                              );
-                            }).toList(),
+                            items: List.generate(roomType.availableRooms, (i) => i + 1)
+                                .map((value) => DropdownMenuItem<int>(
+                                      value: value,
+                                      child: Text(' $value phòng'),
+                                    ))
+                                .toList(),
                             onChanged: (value) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
@@ -364,7 +373,7 @@ class _RoomListWidgetState extends State<RoomListWidget> {
                   ],
                 ),
               ),
-              if (index < widget.rooms.length - 1)
+              if (index < displayRooms.length - 1)
                 Divider(height: 1, color: Colors.grey.shade300),
             ],
           );

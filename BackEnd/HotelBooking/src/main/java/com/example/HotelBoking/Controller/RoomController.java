@@ -6,10 +6,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/rooms")
+@RequestMapping(value = "/api/rooms", produces = "application/json; charset=UTF-8")
 public class RoomController {
     @Autowired
     private RoomService roomService;
@@ -30,8 +35,22 @@ public class RoomController {
 
     // Lấy danh sách phòng theo khách sạn
     @GetMapping("/hotel/{hotelId}")
-    public List<RoomDTO> getRoomsByHotel(@PathVariable Integer hotelId) {
-        return roomService.getRoomsByHotelId(hotelId);
+    public List<RoomDTO> getRoomsByHotel(
+            @PathVariable Integer hotelId,
+            @RequestParam(required = false) String checkIn,
+            @RequestParam(required = false) String checkOut) {
+        LocalDate checkInDate = null;
+        LocalDate checkOutDate = null;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        try {
+            if (checkIn != null) checkInDate = LocalDate.parse(checkIn, formatter);
+            if (checkOut != null) checkOutDate = LocalDate.parse(checkOut, formatter);
+        } catch (Exception e) {
+            // Xử lý lỗi parse date nếu cần
+        }
+        if (checkInDate == null) checkInDate = LocalDate.now();
+        if (checkOutDate == null) checkOutDate = checkInDate.plusDays(1);
+        return roomService.getRoomsByHotelId(hotelId, checkInDate, checkOutDate);
     }
 
     // Thêm phòng mới

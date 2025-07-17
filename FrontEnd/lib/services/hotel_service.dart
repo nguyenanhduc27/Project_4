@@ -60,8 +60,8 @@ class HotelService {
     }
   }
 
-  Future<List<Room>> fetchRoomsByHotelId(int hotelId) async {
-    final url = Uri.parse('$_baseUrl/hotels/$hotelId/rooms');
+  Future<List<Room>> fetchRoomsByHotelId(int hotelId, {required String checkIn, required String checkOut}) async {
+    final url = Uri.parse('$_baseUrl/rooms/hotel/$hotelId?checkIn=$checkIn&checkOut=$checkOut');
     final token = await AuthService().getToken();
     final headers = {
       'Content-Type': 'application/json',
