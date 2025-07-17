@@ -134,39 +134,39 @@ class CustomHeader extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  // Co giãn phần menu
-                  child: SingleChildScrollView(
-                    // Phòng trường hợp menu dài
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        TextButton(onPressed: () {}, child: Text('Home')),
-                        SizedBox(width: 20),
-                        TextButton(onPressed: () {}, child: Text('Pages')),
-                        SizedBox(width: 20),
-                        TextButton(onPressed: () {}, child: Text('Rooms')),
-                        SizedBox(width: 20),
-                        TextButton(
-                            onPressed: () {}, child: Text('Reservation')),
-                        SizedBox(width: 20),
-                        TextButton(onPressed: () {}, child: Text('Blog')),
-                        SizedBox(width: 20),
-                        TextButton(onPressed: () {}, child: Text('Contact')),
-                      ],
-                    ),
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    foregroundColor: Colors.white,
-                  ),
-                  child: Text('BOOK NOW'),
-                ),
-              ],
+              // children: [
+              //   Expanded(
+              //     // Co giãn phần menu
+              //     child: SingleChildScrollView(
+              //       // Phòng trường hợp menu dài
+              //       scrollDirection: Axis.horizontal,
+              //       child: Row(
+              //         children: [
+              //           TextButton(onPressed: () {}, child: Text('Home')),
+              //           SizedBox(width: 20),
+              //           TextButton(onPressed: () {}, child: Text('Pages')),
+              //           SizedBox(width: 20),
+              //           TextButton(onPressed: () {}, child: Text('Rooms')),
+              //           SizedBox(width: 20),
+              //           TextButton(
+              //               onPressed: () {}, child: Text('Reservation')),
+              //           SizedBox(width: 20),
+              //           TextButton(onPressed: () {}, child: Text('Blog')),
+              //           SizedBox(width: 20),
+              //           TextButton(onPressed: () {}, child: Text('Contact')),
+              //         ],
+              //       ),
+              //     ),
+              //   ),
+              //   ElevatedButton(
+              //     onPressed: () {},
+              //     style: ElevatedButton.styleFrom(
+              //       backgroundColor: Colors.black,
+              //       foregroundColor: Colors.white,
+              //     ),
+              //     child: Text('BOOK NOW'),
+              //   ),
+              // ],
             ),
           )
         ],

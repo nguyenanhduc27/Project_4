@@ -28,6 +28,12 @@ public class RoomType {
     @Column(name = "area")
     private BigDecimal area;
 
+    @Column(name = "is_available")
+    private Boolean isAvailable;
+
+    @Column(name = "room_image")
+    private String roomImage;
+
     public RoomType(){}
 
     public RoomType(Integer id, String name, String description, BigDecimal price, Integer maxGuests) {
@@ -92,5 +98,18 @@ public class RoomType {
 
     public void setArea(BigDecimal area) {
         this.area = area;
+    }
+
+    public Boolean getIsAvailable() {
+        return isAvailable;
+    }
+    public void setIsAvailable(Boolean isAvailable) {
+        this.isAvailable = isAvailable;
+    }
+    public String getRoomImage() {
+        return roomImage;
+    }
+    public void setRoomImage(String roomImage) {
+        this.roomImage = roomImage;
     }
 }

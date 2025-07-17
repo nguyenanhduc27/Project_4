@@ -2,15 +2,13 @@ package com.example.HotelBoking.Service;
 
 import com.example.HotelBoking.DTO.RoomDTO;
 import com.example.HotelBoking.DTO.RoomTypeDTO;
-import com.example.HotelBoking.DTO.AmenityDTO;
-import com.example.HotelBoking.Entity.Amenity;
 import com.example.HotelBoking.Entity.Hotel;
 import com.example.HotelBoking.Entity.Room;
 import com.example.HotelBoking.Entity.RoomType;
-import com.example.HotelBoking.Repository.AmenityRepository;
 import com.example.HotelBoking.Repository.HotelRepository;
 import com.example.HotelBoking.Repository.RoomRepository;
 import com.example.HotelBoking.Repository.RoomTypeRepository;
+import com.example.HotelBoking.Repository.RoomTypeAmenityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,15 +25,14 @@ public class RoomService {
     @Autowired
     private RoomTypeRepository roomTypeRepository;
     @Autowired
-    private AmenityRepository amenityRepository;
+    private RoomTypeAmenityRepository roomTypeAmenityRepository;
+    // Removed AmenityRepository
 
     // Mapping entity -> DTO
     private RoomDTO toDTO(Room room) {
         RoomDTO dto = new RoomDTO();
         dto.setId(room.getId());
         dto.setHotelId(room.getHotel() != null ? (room.getHotel().getId() != null ? room.getHotel().getId().intValue() : null) : null);
-        dto.setIsAvailable(room.getIsAvailable());
-        dto.setRoomImage(room.getRoomImage());
         // RoomType
         if (room.getRoomType() != null) {
             RoomType type = room.getRoomType();
@@ -47,18 +44,13 @@ public class RoomService {
             typeDTO.setMaxGuests(type.getMaxGuests());
             typeDTO.setDoubleBed(type.getDoubleBed());
             typeDTO.setArea(type.getArea());
+            typeDTO.setIsAvailable(type.getIsAvailable());
+            typeDTO.setRoomImage(type.getRoomImage());
+            // Lấy amenities từ bảng room_types_amenities
+            typeDTO.setAmenities(roomTypeAmenityRepository.findAmenityNamesByRoomTypeId(type.getId()));
             dto.setRoomType(typeDTO);
         }
-        // Amenities
-        if (room.getAmenities() != null) {
-            List<AmenityDTO> amenityDTOs = room.getAmenities().stream().map(a -> {
-                AmenityDTO adto = new AmenityDTO();
-                adto.setId(a.getId());
-                adto.setName(a.getName());
-                return adto;
-            }).collect(Collectors.toList());
-            dto.setAmenities(amenityDTOs);
-        }
+        // Removed amenities mapping
         return dto;
     }
 
@@ -66,8 +58,6 @@ public class RoomService {
     private Room toEntity(RoomDTO dto) {
         Room room = new Room();
         room.setId(dto.getId());
-        room.setIsAvailable(dto.getIsAvailable());
-        room.setRoomImage(dto.getRoomImage());
         // Hotel
         if (dto.getHotelId() != null) {
             Hotel hotel = hotelRepository.findById((int) dto.getHotelId().longValue()).orElse(null);
@@ -78,14 +68,7 @@ public class RoomService {
             RoomType type = roomTypeRepository.findById(dto.getRoomType().getId()).orElse(null);
             room.setRoomType(type);
         }
-        // Amenities
-        if (dto.getAmenities() != null) {
-            Set<Amenity> amenities = dto.getAmenities().stream()
-                    .map(a -> amenityRepository.findById(a.getId()).orElse(null))
-                    .filter(a -> a != null)
-                    .collect(Collectors.toSet());
-            room.setAmenities(amenities);
-        }
+        // Removed amenities mapping
         return room;
     }
 

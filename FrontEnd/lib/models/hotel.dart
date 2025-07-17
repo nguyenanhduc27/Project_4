@@ -9,6 +9,7 @@ class Hotel {
   final String city; // Thêm trường city
   final String? thumbnailUrl;
   final List<String> imageUrls;
+  final List<String>? amenities;
 
   Hotel({
     required this.id,
@@ -19,6 +20,7 @@ class Hotel {
     required this.city, // Thêm vào constructor
     this.thumbnailUrl,
     required this.imageUrls,
+    this.amenities,
   });
 
   factory Hotel.fromJson(Map<String, dynamic> json) {
@@ -31,6 +33,7 @@ class Hotel {
       city: json['city'] ?? '', // Parse từ json
       thumbnailUrl: UrlHelper.normalizeImageUrl(json['thumbnailUrl']),
       imageUrls: (json['imageUrls'] as List<dynamic>? ?? []).map((e) => UrlHelper.normalizeImageUrl(e as String)).toList(),
+      amenities: (json['amenities'] as List<dynamic>? ?? []).cast<String>(),
     );
   }
 }

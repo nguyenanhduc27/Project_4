@@ -8,6 +8,7 @@ import com.example.HotelBoking.Enum.BookingStatus;
 import com.example.HotelBoking.Repository.BookingDetailRepository;
 import com.example.HotelBoking.Repository.HotelRepository;
 import com.example.HotelBoking.Repository.HotelImageRepository;
+import com.example.HotelBoking.Repository.HotelAmenityRepository;
 import com.example.HotelBoking.Repository.RoomRepository;
 import com.example.HotelBoking.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,9 @@ public class HotelService {
     @Autowired
     private HotelImageRepository hotelImageRepository;
 
+    @Autowired
+    private HotelAmenityRepository hotelAmenityRepository;
+
 
     public HotelDTO toDTO(Hotel h) {
         HotelDTO dto = new HotelDTO();
@@ -54,6 +58,8 @@ public class HotelService {
             .map(img -> img.getImageUrl())
             .collect(java.util.stream.Collectors.toList());
         dto.setImageUrls(imageUrls);
+        // Lấy amenities từ bảng hotel_amenities
+        dto.setAmenities(hotelAmenityRepository.findAmenityNamesByHotelId(h.getId()));
         return dto;
     }
 
@@ -118,7 +124,7 @@ public class HotelService {
             int availableCount = 0;
 
             for (Room room : rooms) {
-                if (!room.getIsAvailable()) continue;
+                if (room.getRoomType() == null || !Boolean.TRUE.equals(room.getRoomType().getIsAvailable())) continue;
 
                 boolean isBooked = bookingDetailRepository.existsActiveBooking(
                         room.getId(), statuses, checkIn, checkOut

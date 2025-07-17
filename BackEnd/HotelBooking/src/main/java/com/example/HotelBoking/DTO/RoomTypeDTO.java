@@ -1,6 +1,7 @@
 package com.example.HotelBoking.DTO;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public class RoomTypeDTO {
     private Integer id;
@@ -10,6 +11,9 @@ public class RoomTypeDTO {
     private Integer maxGuests;
     private Integer doubleBed;
     private BigDecimal area;
+    private Boolean isAvailable;
+    private String roomImage;
+    private List<String> amenities;
 
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
@@ -25,4 +29,10 @@ public class RoomTypeDTO {
     public void setDoubleBed(Integer doubleBed) { this.doubleBed = doubleBed; }
     public BigDecimal getArea() { return area; }
     public void setArea(BigDecimal area) { this.area = area; }
+    public Boolean getIsAvailable() { return isAvailable; }
+    public void setIsAvailable(Boolean isAvailable) { this.isAvailable = isAvailable; }
+    public String getRoomImage() { return roomImage; }
+    public void setRoomImage(String roomImage) { this.roomImage = roomImage; }
+    public List<String> getAmenities() { return amenities; }
+    public void setAmenities(List<String> amenities) { this.amenities = amenities; }
 }

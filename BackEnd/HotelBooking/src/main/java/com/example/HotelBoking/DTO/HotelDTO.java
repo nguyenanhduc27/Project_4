@@ -26,6 +26,8 @@ public class HotelDTO {
 
     private List<String> imageUrls;
 
+    private List<String> amenities;
+
     public HotelDTO(){}
 
     
@@ -117,4 +119,7 @@ public class HotelDTO {
     public void setImageUrls(List<String> imageUrls) {
         this.imageUrls = imageUrls;
     }
+
+    public List<String> getAmenities() { return amenities; }
+    public void setAmenities(List<String> amenities) { this.amenities = amenities; }
 }
