@@ -1,4 +1,5 @@
 class RoomOption {
+  final int id;
   final String type;
   final String bedInfo;
   final int guestCount;
@@ -7,6 +8,7 @@ class RoomOption {
   final bool payLater;
 
   RoomOption({
+    required this.id, 
     required this.type,
     required this.bedInfo,
     required this.guestCount,
@@ -14,4 +16,16 @@ class RoomOption {
     required this.freeCancellation,
     required this.payLater,
   });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'type': type,
+      'bedInfo': bedInfo,
+      'guestCount': guestCount,
+      'price': price,
+      'freeCancellation': freeCancellation,
+      'payLater': payLater,
+    };
+  }
 }

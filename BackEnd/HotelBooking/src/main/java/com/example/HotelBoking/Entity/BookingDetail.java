@@ -21,22 +21,18 @@ public class BookingDetail {
     @JoinColumn(name = "room_id", nullable = false)
     private Room room;
 
-    @Column(nullable = false)
-    private BigDecimal price;
-
     private Integer nights;
 
-    @Column(name = "total")
+    @Column(insertable = false, updatable = false)
     private BigDecimal total;
 
     // Getters and Setters
     public BookingDetail(){}
 
-    public BookingDetail(Long id, Booking booking, Room room, BigDecimal price, Integer nights, BigDecimal total) {
+    public BookingDetail(Long id, Booking booking, Room room, Integer nights, BigDecimal total) {
         this.id = id;
         this.booking = booking;
         this.room = room;
-        this.price = price;
         this.nights = nights;
         this.total = total;
     }
@@ -65,13 +61,7 @@ public class BookingDetail {
         this.room = room;
     }
 
-    public BigDecimal getPrice() {
-        return price;
-    }
 
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
 
     public Integer getNights() {
         return nights;
@@ -84,9 +74,9 @@ public class BookingDetail {
     public BigDecimal getTotal() {
         return total;
     }
-
-    public void setTotal(BigDecimal total) {
-        this.total = total;
-    }
+//
+//    public void setTotal(BigDecimal total) {
+//        this.total = total;
+//    }
 }
 

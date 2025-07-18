@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDate;
 import java.util.List;
 
-public interface BookingDetailRepository extends JpaRepository<BookingDetail, Integer> {
+public interface BookingDetailRepository extends JpaRepository<BookingDetail, Long> {
     @Query("SELECT CASE WHEN COUNT(bd) > 0 THEN true ELSE false END " +
             "FROM BookingDetail bd " +
             "WHERE bd.room.id = :roomId " +

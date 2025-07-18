@@ -12,10 +12,20 @@ import '../utils/url_helper.dart';
 import '../services/hotel_service.dart';
 import '../widgets/room_list.dart';
 import 'package:intl/intl.dart';
+import 'booking_input_page.dart';
+import 'payment_page.dart';
 
 class HotelDetailPage extends StatefulWidget {
   final Hotel hotel;
-  const HotelDetailPage({super.key, required this.hotel});
+  final DateTime checkInDate;
+  final DateTime checkOutDate;
+
+  const HotelDetailPage({
+    super.key,
+    required this.hotel,
+    required this.checkInDate,
+    required this.checkOutDate,
+  });
   @override
   State<HotelDetailPage> createState() => _HotelDetailPageState();
 }
@@ -26,9 +36,33 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
   bool isLoadingRooms = true;
   String? roomsError;
 
+  // Giỏ phòng: List<Map> với roomType, quantity
+  List<Map<String, dynamic>> cart = [];
+
   HotelMarker? selectedHotel;
-  
+
+  void _addToCart(RoomType roomType, int quantity) {
+    setState(() {
+      // Nếu đã có loại phòng này trong giỏ thì cập nhật số lượng
+      final idx = cart.indexWhere((item) => item['roomType'].id == roomType.id);
+      if (idx >= 0) {
+        cart[idx]['quantity'] = quantity;
+      } else {
+        cart.add({'roomType': roomType, 'quantity': quantity});
+      }
+      // Nếu quantity = 0 thì xóa khỏi giỏ
+      cart.removeWhere((item) => item['quantity'] == 0);
+    });
+  }
+
+  void _removeFromCart(int roomTypeId) {
+    setState(() {
+      cart.removeWhere((item) => item['roomType'].id == roomTypeId);
+    });
+  }
+
   void _showRoomDetailPopup(RoomType roomType, int index) {
+    print('Amenities (popup): ${roomType.amenities}');
     showDialog(
       context: context,
       builder: (context) {
@@ -51,13 +85,13 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
                             return Image.asset(
-                              'images/room${(index % 6) + 1}.jpg',
+                              'images/room1.jpg',
                               fit: BoxFit.cover,
                             );
                           },
                         )
                       : Image.asset(
-                          'images/room${(index % 6) + 1}.jpg',
+                          'images/room1.jpg',
                           fit: BoxFit.cover,
                         ),
                 ),
@@ -72,6 +106,11 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
                         roomType.name,
                         style: const TextStyle(
                             fontSize: 22, fontWeight: FontWeight.bold),
+                      ),
+                      TextButton(
+                        onPressed: () => _showRoomDetailPopup(roomType, index),
+                        child: const Text('Xem chi tiết',
+                            style: TextStyle(color: Colors.blue)),
                       ),
                       const SizedBox(height: 8),
                       Text('Giường: ${roomType.doubleBed ?? 1} giường đôi'),
@@ -359,10 +398,10 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
       roomsError = null;
     });
     try {
-      final now = DateTime.now();
-      final checkIn = DateFormat('yyyy-MM-dd').format(now);
-      final checkOut = DateFormat('yyyy-MM-dd').format(now.add(Duration(days: 1)));
-      final result = await _hotelService.fetchRoomsByHotelId(widget.hotel.id, checkIn: checkIn, checkOut: checkOut);
+      final checkIn = DateFormat('yyyy-MM-dd').format(widget.checkInDate);
+      final checkOut = DateFormat('yyyy-MM-dd').format(widget.checkOutDate);
+      final result = await _hotelService.fetchRoomsByHotelId(widget.hotel.id,
+          checkIn: checkIn, checkOut: checkOut);
       setState(() {
         rooms = result;
         isLoadingRooms = false;
@@ -375,8 +414,15 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
     }
   }
 
+  int _calculateNights() {
+    return widget.checkOutDate.difference(widget.checkInDate).inDays;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final roomsToShow = rooms
+        .where((room) => (room.roomType?.availableRooms ?? 0) > 0)
+        .toList();
     return Scaffold(
       backgroundColor: Colors.white,
       body: LayoutBuilder(
@@ -422,7 +468,10 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
                                 Expanded(
                                   flex: 2,
                                   child: GestureDetector(
-                                    onTap: () => _openImageGallery(widget.hotel.imageUrls.isNotEmpty ? widget.hotel.imageUrls[0] : ''),
+                                    onTap: () => _openImageGallery(
+                                        widget.hotel.imageUrls.isNotEmpty
+                                            ? widget.hotel.imageUrls[0]
+                                            : ''),
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(12),
                                       child: widget.hotel.imageUrls.isNotEmpty
@@ -446,45 +495,87 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
                                     children: [
                                       Row(
                                         children: [
-                                          for (int i = 1; i < (widget.hotel.imageUrls.length > 3 ? 3 : widget.hotel.imageUrls.length); i++)
-                                            Expanded(
+                                          for (int i = 1;
+                                              i <
+                                                  (widget.hotel.imageUrls
+                                                              .length >
+                                                          3
+                                                      ? 3
+                                                      : widget.hotel.imageUrls
+                                                          .length);
+                                              i++)
+                                            Padding(
+                                              padding: EdgeInsets.only(
+                                                  left: i == 1 ? 0 : 5),
                                               child: GestureDetector(
-                                                onTap: () => _openImageGallery(widget.hotel.imageUrls[i]),
+                                                onTap: () => _openImageGallery(
+                                                    widget.hotel.imageUrls[i]),
                                                 child: ClipRRect(
-                                                  borderRadius: BorderRadius.circular(8),
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
                                                   child: Image.network(
                                                     widget.hotel.imageUrls[i],
                                                     height: 146,
+                                                    width: 146,
                                                     fit: BoxFit.cover,
                                                   ),
                                                 ),
                                               ),
                                             ),
                                           if (widget.hotel.imageUrls.length < 3)
-                                            for (int i = widget.hotel.imageUrls.length; i < 3; i++)
-                                              Expanded(child: SizedBox()),
+                                            for (int i = widget
+                                                    .hotel.imageUrls.length;
+                                                i < 3;
+                                                i++)
+                                              Padding(
+                                                padding: EdgeInsets.only(
+                                                    left: i == 1 ? 0 : 5),
+                                                child: SizedBox(
+                                                    width: 146, height: 146),
+                                              ),
                                         ],
                                       ),
                                       const SizedBox(height: 8),
                                       Row(
                                         children: [
-                                          for (int i = 3; i < (widget.hotel.imageUrls.length > 5 ? 5 : widget.hotel.imageUrls.length); i++)
-                                            Expanded(
+                                          for (int i = 3;
+                                              i <
+                                                  (widget.hotel.imageUrls
+                                                              .length >
+                                                          5
+                                                      ? 5
+                                                      : widget.hotel.imageUrls
+                                                          .length);
+                                              i++)
+                                            Padding(
+                                              padding: EdgeInsets.only(
+                                                  left: i == 3 ? 0 : 5),
                                               child: GestureDetector(
-                                                onTap: () => _openImageGallery(widget.hotel.imageUrls[i]),
+                                                onTap: () => _openImageGallery(
+                                                    widget.hotel.imageUrls[i]),
                                                 child: ClipRRect(
-                                                  borderRadius: BorderRadius.circular(8),
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
                                                   child: Image.network(
                                                     widget.hotel.imageUrls[i],
                                                     height: 146,
+                                                    width: 146,
                                                     fit: BoxFit.cover,
                                                   ),
                                                 ),
                                               ),
                                             ),
                                           if (widget.hotel.imageUrls.length < 5)
-                                            for (int i = widget.hotel.imageUrls.length; i < 5; i++)
-                                              Expanded(child: SizedBox()),
+                                            for (int i = widget
+                                                    .hotel.imageUrls.length;
+                                                i < 5;
+                                                i++)
+                                              Padding(
+                                                padding: EdgeInsets.only(
+                                                    left: i == 3 ? 0 : 5),
+                                                child: SizedBox(
+                                                    width: 146, height: 146),
+                                              ),
                                         ],
                                       ),
                                     ],
@@ -506,26 +597,31 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
                                   const SizedBox(width: 4),
                                   Expanded(
                                     child: Text(
-                                      widget.hotel.city.isNotEmpty ? widget.hotel.city : widget.hotel.address,
-                                      style:
-                                          const TextStyle(color: Colors.blueAccent),
+                                      widget.hotel.city.isNotEmpty
+                                          ? widget.hotel.city
+                                          : widget.hotel.address,
+                                      style: const TextStyle(
+                                          color: Colors.blueAccent),
                                     ),
                                   ),
                                 ],
                               ),
                             ),
                             const SizedBox(height: 30),
-                            Text(widget.hotel.description, style: TextStyle(fontSize: 16, height: 1.6)),
+                            Text(widget.hotel.description,
+                                style: TextStyle(fontSize: 16, height: 1.6)),
                             const SizedBox(height: 20),
                             Row(
-  children: List.generate(5, (index) {
-    return Icon(
-      index < widget.hotel.starRating ? Icons.star : Icons.star_border,
-      color: Colors.amber,
-      size: 22,
-    );
-  }),
-),
+                              children: List.generate(5, (index) {
+                                return Icon(
+                                  index < widget.hotel.starRating
+                                      ? Icons.star
+                                      : Icons.star_border,
+                                  color: Colors.amber,
+                                  size: 22,
+                                );
+                              }),
+                            ),
                             const SizedBox(height: 40),
                             const Divider(),
                             const Text('Hotel Amenities',
@@ -535,8 +631,10 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
                             Wrap(
                               spacing: 16,
                               runSpacing: 16,
-                              children: (widget.hotel.amenities ?? []).map((amenity) {
-                                IconData icon = Icons.check_circle; // default icon
+                              children:
+                                  (widget.hotel.amenities ?? []).map((amenity) {
+                                IconData icon =
+                                    Icons.check_circle; // default icon
                                 switch (amenity) {
                                   case 'Wi-Fi miễn phí':
                                   case 'WiFi miễn phí':
@@ -609,7 +707,7 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
                         ),
                       ),
                       const SizedBox(width: 40),
-                      const SizedBox(width: 320, child: BookingDropdownForm()),
+                      // XÓA BookingCartWidget ở phần cạnh ảnh khách sạn (Row đầu tiên)
                     ],
                   ),
                 ),
@@ -619,20 +717,51 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
                 child: Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 200, vertical: 40),
-                  child: Column(
+                  child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Tùy Chọn Phòng',
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
+                      Expanded(
+                        flex: 3,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Tùy Chọn Phòng',
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 20),
+                            RoomListWidget(
+                              rooms: roomsToShow,
+                              isLoading: isLoadingRooms,
+                              error: roomsError,
+                              onRetry: _fetchRooms,
+                              onAddToCart: _addToCart,
+                            ),
+                          ],
+                        ),
                       ),
-                      const SizedBox(height: 20),
-                      RoomListWidget(
-                        rooms: rooms,
-                        isLoading: isLoadingRooms,
-                        error: roomsError,
-                        onRetry: _fetchRooms,
+                      const SizedBox(width: 40),
+                      SizedBox(
+                        width: 320,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Phòng đã chọn',
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 20),
+                            BookingCartWidget(
+                              cart: cart,
+                              onRemove: _removeFromCart,
+                              hotel: widget.hotel,
+                              checkInDate: widget.checkInDate,
+                              checkOutDate: widget.checkOutDate,
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -714,6 +843,141 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+class BookingCartWidget extends StatelessWidget {
+  final List<Map<String, dynamic>> cart;
+  final void Function(int roomTypeId) onRemove;
+  final Hotel hotel; // Added hotel parameter
+  final DateTime checkInDate; // Added checkInDate parameter
+  final DateTime checkOutDate; // Added checkOutDate parameter
+
+  const BookingCartWidget({
+    super.key,
+    required this.cart,
+    required this.onRemove,
+    required this.hotel, // Initialize hotel
+    required this.checkInDate, // Initialize checkInDate
+    required this.checkOutDate, // Initialize checkOutDate
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (cart.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.grey[50],
+          border: Border.all(color: Colors.grey.shade300),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: const Text('Chưa chọn phòng nào'),
+      );
+    }
+    // Tính số đêm lưu trú
+    final checkIn = (context
+            .findAncestorStateOfType<_HotelDetailPageState>()
+            ?.widget
+            .checkInDate ??
+        DateTime.now());
+    final checkOut = (context
+            .findAncestorStateOfType<_HotelDetailPageState>()
+            ?.widget
+            .checkOutDate ??
+        DateTime.now().add(const Duration(days: 1)));
+    final int nights = checkOut.difference(checkIn).inDays;
+    double total = 0;
+    for (var item in cart) {
+      total += (item['roomType'].price ?? 0) * (item['quantity'] ?? 0) * nights;
+    }
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Phòng đã chọn',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          const SizedBox(height: 12),
+          Text('Nhận phòng: ${DateFormat('dd/MM/yyyy').format(checkIn)}'),
+          Text('Trả phòng: ${DateFormat('dd/MM/yyyy').format(checkOut)}'),
+          Text('Tổng số phòng: ${cart.length}'),
+          ...cart.map((item) => Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(item['roomType'].name,
+                        style: const TextStyle(fontWeight: FontWeight.w500)),
+                    Text('Số lượng: ${item['quantity']}'),
+                    Text(
+                        'Giá: ${(item['roomType'].price).toStringAsFixed(0)} VND'),
+                  ],
+                ),
+              )),
+          const Divider(),
+          Text('Tổng: ${total.toStringAsFixed(0)} VND',
+              style: const TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                try {
+                  // Tính tổng số phòng và tổng số khách nếu cần
+                  int totalRooms = cart.fold(
+                      0, (sum, item) => sum + ((item['quantity'] ?? 0) as int));
+                  // Nếu có số khách, bạn cũng tính ở đây
+
+                  // Chuyển đổi cart sang danh sách RoomOption hoặc dữ liệu phù hợp với BookingInputPage
+                  List<Map<String, dynamic>> bookingRooms = cart
+                      .map((item) => {
+                            'room': RoomOption(
+                              id: item['roomType'].id,
+                              type: item['roomType'].name,
+                              bedInfo:
+                                  '${item['roomType'].doubleBed ?? 1} giường đôi',
+                              guestCount: item['roomType'].maxGuests ?? 1,
+                              price: item['roomType'].price?.toDouble() ?? 0.0,
+                              freeCancellation: false,
+                              payLater: false,
+                            ),
+                            'quantity': item['quantity'],
+                          })
+                      .toList();
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => BookingInputPage(
+                        hotel: hotel,
+                        bookingRooms: bookingRooms,
+                        checkInDate: checkInDate,
+                        checkOutDate: checkOutDate,
+                        numberOfGuests: 1, // hoặc tính tổng số khách nếu có
+                        numberOfRooms: totalRooms,
+                      ),
+                    ),
+                  );
+                } catch (e, stack) {
+                  print('Lỗi khi chuyển trang: $e');
+                  print(stack);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Có lỗi khi chuyển trang: $e')),
+                  );
+                }
+              },
+              child: const Text('Tiếp tục đặt phòng'),
+            ),
+          ),
+        ],
       ),
     );
   }

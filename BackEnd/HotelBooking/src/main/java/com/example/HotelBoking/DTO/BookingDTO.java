@@ -8,15 +8,20 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import com.example.HotelBoking.DTO.BookingContactDTO;
+import java.util.List;
 
 public class BookingDTO {
     private Long id;
     private Long userId;
+    private Long hotelId; // Thêm trường hotelId
     private LocalDate checkIn;
     private LocalDate checkOut;
     private BigDecimal totalPrice;
     private BookingStatus status;
     private LocalDateTime createdAt;
+    private BookingContactDTO contact;
+    private List<BookingDetailDTO> rooms; // Thêm trường rooms
 
     public BookingDTO(){}
 
@@ -44,6 +49,14 @@ public class BookingDTO {
 
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    public Long getHotelId() {
+        return hotelId;
+    }
+
+    public void setHotelId(Long hotelId) {
+        this.hotelId = hotelId;
     }
 
     public LocalDate getCheckIn() {
@@ -85,4 +98,10 @@ public class BookingDTO {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+
+    public BookingContactDTO getContact() { return contact; }
+    public void setContact(BookingContactDTO contact) { this.contact = contact; }
+
+    public List<BookingDetailDTO> getRooms() { return rooms; }
+    public void setRooms(List<BookingDetailDTO> rooms) { this.rooms = rooms; }
 }

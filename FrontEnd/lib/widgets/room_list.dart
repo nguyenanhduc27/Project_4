@@ -7,6 +7,7 @@ class RoomListWidget extends StatefulWidget {
   final bool isLoading;
   final String? error;
   final void Function()? onRetry;
+  final void Function(RoomType roomType, int quantity)? onAddToCart;
 
   const RoomListWidget({
     Key? key,
@@ -14,6 +15,7 @@ class RoomListWidget extends StatefulWidget {
     required this.isLoading,
     required this.error,
     this.onRetry,
+    this.onAddToCart,
   }) : super(key: key);
 
   @override
@@ -21,6 +23,9 @@ class RoomListWidget extends StatefulWidget {
 }
 
 class _RoomListWidgetState extends State<RoomListWidget> {
+  // Quản lý số lượng đã chọn cho từng roomType.id
+  Map<int, int> selectedQuantities = {};
+
   void _showRoomDetailPopup(RoomType roomType, int index) {
     showDialog(
       context: context,
@@ -215,6 +220,7 @@ class _RoomListWidgetState extends State<RoomListWidget> {
           final room = entry.value;
           final roomType = room.roomType;
           if (roomType == null) return const SizedBox.shrink();
+          final int selectedQuantity = selectedQuantities[roomType.id] ?? 0;
           return Column(
             children: [
               Padding(
@@ -254,10 +260,21 @@ class _RoomListWidgetState extends State<RoomListWidget> {
                         children: [
                           Text(
                             roomType.name,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.blueAccent,
+                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blueAccent),
+                          ),
+                          GestureDetector(
+                            onTap: () => _showRoomDetailPopup(roomType, index),
+                            child: MouseRegion(
+                              cursor: SystemMouseCursors.click,
+                              child: Text(
+                                'Xem chi tiết',
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w500,
+                                  decoration: TextDecoration.none, // Không gạch chân
+                                ),
+                              ),
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -335,37 +352,16 @@ class _RoomListWidgetState extends State<RoomListWidget> {
                       child: Column(
                         children: [
                           DropdownButton<int>(
-                            value: 1,
-                            items: List.generate(roomType.availableRooms, (i) => i + 1)
-                                .map((value) => DropdownMenuItem<int>(
-                                      value: value,
-                                      child: Text(' $value phòng'),
-                                    ))
-                                .toList(),
+                            value: selectedQuantity,
+                            items: [for (int i = 0; i <= roomType.availableRooms; i++) DropdownMenuItem(value: i, child: Text(' $i phòng'))],
                             onChanged: (value) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Đã chọn $value phòng ${roomType.name}'),
-                                ),
-                              );
+                              setState(() {
+                                selectedQuantities[roomType.id] = value ?? 0;
+                              });
+                              if (widget.onAddToCart != null) {
+                                widget.onAddToCart!(roomType, value ?? 0);
+                              }
                             },
-                          ),
-                          const SizedBox(height: 8),
-                          ElevatedButton(
-                            onPressed: roomType.isAvailable == true
-                                ? () {
-                                    _showRoomDetailPopup(roomType, index);
-                                  }
-                                : null,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            child: Text(roomType.isAvailable == true ? 'Đặt Ngay' : 'Hết phòng'),
                           ),
                         ],
                       ),

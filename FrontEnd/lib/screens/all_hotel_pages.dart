@@ -61,7 +61,7 @@ class AllHotelsPage extends StatelessWidget {
                     ),
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
-                        return HotelCard(hotel: hotels[index]);
+                        return HotelCard(hotel: hotels[index], checkInDate: DateTime.now(), checkOutDate: DateTime.now().add(Duration(days: 1)));
                       },
                       childCount: hotels.length,
                     ),

@@ -18,7 +18,7 @@ public class Booking {
 
     // Quan hệ N-1 với User
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = true)
     private User user;
 
     @Column(name = "check_in")

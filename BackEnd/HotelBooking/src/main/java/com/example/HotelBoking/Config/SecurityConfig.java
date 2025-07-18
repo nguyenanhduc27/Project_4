@@ -45,7 +45,10 @@ public class SecurityConfig {
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/hotels/**").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/rooms/**").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/uploads/**").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/bookings").permitAll()
                         .anyRequest().authenticated()
+
+
                 )
                 .sessionManagement(sess -> sess
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)

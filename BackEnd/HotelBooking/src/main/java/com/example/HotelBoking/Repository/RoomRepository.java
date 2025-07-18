@@ -13,6 +13,12 @@ import java.time.LocalDate;
 @Repository
 public interface RoomRepository extends JpaRepository<Room, Integer> {
     List<Room> findByHotel_Id(Integer hotelId);
+    
+    // Thêm method để tìm room theo roomTypeId
+    List<Room> findByRoomType_Id(Integer roomTypeId);
+    
+    // Thêm method để tìm room theo hotel và roomType
+    List<Room> findByHotel_IdAndRoomType_Id(Integer hotelId, Integer roomTypeId);
 
     @Query(value = "SELECT COUNT(r.id) FROM Room r WHERE r.roomType.id = :roomTypeId AND r.hotel.id = :hotelId AND r.id NOT IN (" +
             "SELECT bd.room.id FROM BookingDetail bd JOIN bd.booking b " +

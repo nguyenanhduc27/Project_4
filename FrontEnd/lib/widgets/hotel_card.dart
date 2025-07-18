@@ -5,8 +5,10 @@ import '../utils/url_helper.dart';
 
 class HotelCard extends StatelessWidget {
   final Hotel hotel;
+  final DateTime checkInDate;
+  final DateTime checkOutDate;
 
-  const HotelCard({super.key, required this.hotel});
+  const HotelCard({super.key, required this.hotel, required this.checkInDate, required this.checkOutDate});
 
   @override
   Widget build(BuildContext context) {
@@ -87,7 +89,7 @@ class HotelCard extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => HotelDetailPage(hotel: hotel),
+                        builder: (_) => HotelDetailPage(hotel: hotel, checkInDate: checkInDate, checkOutDate: checkOutDate),
                       ),
                     );
                   },

@@ -1,0 +1,53 @@
+### Test tạo booking không đăng nhập (guest booking)
+POST http://localhost:8080/api/bookings
+Content-Type: application/json
+
+{
+  "hotelId": 1,
+  "userId": null,
+  "checkIn": "2024-01-15",
+  "checkOut": "2024-01-17",
+  "totalPrice": 1500000,
+  "contact": {
+    "fullName": "Nguyễn Văn A",
+    "email": "nguyenvana@example.com",
+    "phone": "0123456789",
+    "note": "Khách hàng VIP"
+  },
+  "rooms": [
+    {
+      "roomId": 1,
+      "quantity": 1
+    }
+  ]
+}
+
+### Test tạo booking với user đã đăng nhập
+POST http://localhost:8080/api/bookings
+Content-Type: application/json
+
+{
+  "hotelId": 1,
+  "userId": 1,
+  "checkIn": "2024-01-20",
+  "checkOut": "2024-01-22",
+  "totalPrice": 2000000,
+  "contact": {
+    "fullName": "Trần Thị B",
+    "email": "tranthib@example.com",
+    "phone": "0987654321",
+    "note": ""
+  },
+  "rooms": [
+    {
+      "roomId": 2,
+      "quantity": 2
+    }
+  ]
+}
+
+### Test lấy tất cả bookings
+GET http://localhost:8080/api/bookings
+
+### Test lấy booking theo ID
+GET http://localhost:8080/api/bookings/1 

@@ -12,6 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/bookings")
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:8080", "http://localhost:3001"})
 public class BookingController {
 
     @Autowired
@@ -31,8 +32,15 @@ public class BookingController {
 
     // Thêm booking mới
     @PostMapping
-    public Booking createBooking(@RequestBody BookingDTO dto) {
-        return service.add(dto);
+    public ResponseEntity<?> createBooking(@RequestBody BookingDTO dto) {
+        try {
+            Booking booking = service.add(dto);
+            return ResponseEntity.ok(booking);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("Lỗi dữ liệu: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Lỗi server: " + e.getMessage());
+        }
     }
 
     // Cập nhật booking

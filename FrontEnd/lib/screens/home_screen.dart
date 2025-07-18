@@ -322,7 +322,7 @@ class _HotelSliderState extends State<_HotelSlider> {
                 return Container(
                   width: cardWidth,
                   margin: EdgeInsets.symmetric(horizontal: spacing / 2),
-                  child: HotelCard(hotel: widget.hotels[index]),
+                  child: HotelCard(hotel: widget.hotels[index], checkInDate: DateTime.now(), checkOutDate: DateTime.now().add(Duration(days: 1))),
                 );
               },
             ),

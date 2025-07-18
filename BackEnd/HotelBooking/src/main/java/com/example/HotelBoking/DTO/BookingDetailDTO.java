@@ -7,17 +7,16 @@ public class BookingDetailDTO {
 
     private Long bookingId;
     private Long roomId;
-    private BigDecimal price;
     private Integer nights;
     private BigDecimal total;
+    private Integer quantity; // Thêm trường quantity
 
     public BookingDetailDTO(){}
 
-    public BookingDetailDTO(Long id, Long bookingId, Long roomId, BigDecimal price, Integer nights, BigDecimal total) {
+    public BookingDetailDTO(Long id, Long bookingId, Long roomId, Integer nights, BigDecimal total) {
         this.id = id;
         this.bookingId = bookingId;
         this.roomId = roomId;
-        this.price = price;
         this.nights = nights;
         this.total = total;
     }
@@ -48,13 +47,7 @@ public class BookingDetailDTO {
         this.roomId = roomId;
     }
 
-    public BigDecimal getPrice() {
-        return price;
-    }
 
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
 
     public Integer getNights() {
         return nights;
@@ -70,5 +63,13 @@ public class BookingDetailDTO {
 
     public void setTotal(BigDecimal total) {
         this.total = total;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
     }
 }

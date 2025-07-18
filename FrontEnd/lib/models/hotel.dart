@@ -32,8 +32,24 @@ class Hotel {
       starRating: json['starRating'] ?? json['star_rating'] ?? 0,
       city: json['city'] ?? '', // Parse từ json
       thumbnailUrl: UrlHelper.normalizeImageUrl(json['thumbnailUrl']),
-      imageUrls: (json['imageUrls'] as List<dynamic>? ?? []).map((e) => UrlHelper.normalizeImageUrl(e as String)).toList(),
+      imageUrls: (json['imageUrls'] as List<dynamic>? ?? [])
+          .map((e) => UrlHelper.normalizeImageUrl(e as String))
+          .toList(),
       amenities: (json['amenities'] as List<dynamic>? ?? []).cast<String>(),
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'address': address,
+      'description': description,
+      'starRating': starRating,
+      'city': city,
+      'thumbnailUrl': thumbnailUrl,
+      'imageUrls': imageUrls,
+      'amenities': amenities,
+    };
   }
 }

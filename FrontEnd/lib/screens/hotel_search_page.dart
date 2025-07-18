@@ -265,7 +265,7 @@ class _HotelSearchPageState extends State<HotelSearchPage> {
                                                                 Navigator.push(
                                                                   context,
                                                                   MaterialPageRoute(
-                                                                    builder: (_) => HotelDetailPage(hotel: hotel),
+                                                                    builder: (_) => HotelDetailPage(hotel: hotel, checkInDate: widget.checkInDate, checkOutDate: widget.checkOutDate),
                                                                   ),
                                                                 );
                                                               },
