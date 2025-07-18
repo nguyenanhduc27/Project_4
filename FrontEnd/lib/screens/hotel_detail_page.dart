@@ -32,7 +32,7 @@ class HotelDetailPage extends StatefulWidget {
 
 class _HotelDetailPageState extends State<HotelDetailPage> {
   final HotelService _hotelService = HotelService();
-  List<Room> rooms = [];
+  List<RoomType> roomTypes = [];
   bool isLoadingRooms = true;
   String? roomsError;
 
@@ -389,10 +389,10 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
   @override
   void initState() {
     super.initState();
-    _fetchRooms();
+    _fetchRoomTypes();
   }
 
-  Future<void> _fetchRooms() async {
+  Future<void> _fetchRoomTypes() async {
     setState(() {
       isLoadingRooms = true;
       roomsError = null;
@@ -400,10 +400,13 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
     try {
       final checkIn = DateFormat('yyyy-MM-dd').format(widget.checkInDate);
       final checkOut = DateFormat('yyyy-MM-dd').format(widget.checkOutDate);
-      final result = await _hotelService.fetchRoomsByHotelId(widget.hotel.id,
-          checkIn: checkIn, checkOut: checkOut);
+      final result = await _hotelService.fetchRoomTypesByHotelId(
+        widget.hotel.id,
+        checkIn: checkIn,
+        checkOut: checkOut,
+      );
       setState(() {
-        rooms = result;
+        roomTypes = result;
         isLoadingRooms = false;
       });
     } catch (e) {
@@ -420,9 +423,7 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final roomsToShow = rooms
-        .where((room) => (room.roomType?.availableRooms ?? 0) > 0)
-        .toList();
+    final roomTypesToShow = roomTypes.where((rt) => (rt.availableRooms) > 0).toList();
     return Scaffold(
       backgroundColor: Colors.white,
       body: LayoutBuilder(
@@ -732,10 +733,10 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
                             ),
                             const SizedBox(height: 20),
                             RoomListWidget(
-                              rooms: roomsToShow,
+                              rooms: roomTypesToShow,
                               isLoading: isLoadingRooms,
                               error: roomsError,
-                              onRetry: _fetchRooms,
+                              onRetry: _fetchRoomTypes,
                               onAddToCart: _addToCart,
                             ),
                           ],

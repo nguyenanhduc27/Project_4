@@ -5,6 +5,8 @@ import '../widgets/custom_header.dart';
 import '../widgets/custom_footer.dart';
 import 'package:intl/intl.dart';
 import '../services/booking.dart';
+import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
 
 class PaymentPage extends StatelessWidget {
   final Map<String, dynamic> bookingData;
@@ -22,6 +24,11 @@ class PaymentPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final dataToSend = Map<String, dynamic>.from(bookingData);
+    if (authProvider.isLoggedIn && authProvider.userId != null) {
+      dataToSend['userId'] = authProvider.userId;
+    }
     final hotel = bookingData['hotel'];
     final roomOptions = (bookingData['rooms'] as List)
         .map((e) => e)

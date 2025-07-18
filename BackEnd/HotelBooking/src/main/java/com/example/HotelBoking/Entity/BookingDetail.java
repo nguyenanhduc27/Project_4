@@ -23,6 +23,9 @@ public class BookingDetail {
 
     private Integer nights;
 
+    @Column(nullable = false)
+    private BigDecimal price;
+
     @Column(insertable = false, updatable = false)
     private BigDecimal total;
 
@@ -74,9 +77,13 @@ public class BookingDetail {
     public BigDecimal getTotal() {
         return total;
     }
-//
-//    public void setTotal(BigDecimal total) {
-//        this.total = total;
-//    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
 }
 

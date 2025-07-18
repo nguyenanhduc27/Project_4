@@ -63,9 +63,11 @@ public class UserService {
         Optional<User> opt = repo.findById(id);
         if (opt.isPresent()) {
             User u = opt.get();
-            u.setFullName(dto.getFullName());
-            u.setEmail(dto.getEmail());
-            u.setPhone(dto.getPhone());
+            if (dto.getFullName() != null) u.setFullName(dto.getFullName());
+            if (dto.getPhone() != null) u.setPhone(dto.getPhone());
+            if (dto.getAddress() != null) u.setAddress(dto.getAddress());
+            if (dto.getDateOfBirth() != null) u.setDateOfBirth(dto.getDateOfBirth());
+            // KHÔNG set email!
             return repo.save(u);
         }
         return null;
@@ -80,4 +82,7 @@ public class UserService {
         return false;
     }
 
+    public User findByEmail(String email) {
+        return repo.findByEmail(email);
+    }
 }

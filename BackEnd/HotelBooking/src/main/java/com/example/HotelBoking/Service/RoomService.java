@@ -13,7 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -118,5 +121,31 @@ public class RoomService {
 
     public List<RoomDTO> getRoomsByHotelId(Integer hotelId, LocalDate checkIn, LocalDate checkOut) {
         return roomRepository.findByHotel_Id(hotelId).stream().map(room -> toDTO(room, checkIn, checkOut)).collect(Collectors.toList());
+    }
+
+    public List<RoomTypeDTO> getRoomTypesByHotelId(Integer hotelId, LocalDate checkIn, LocalDate checkOut) {
+        List<Room> rooms = roomRepository.findByHotel_Id(hotelId);
+        Map<Integer, RoomTypeDTO> roomTypeMap = new HashMap<>();
+        for (Room room : rooms) {
+            RoomType type = room.getRoomType();
+            if (type == null) continue;
+            if (!roomTypeMap.containsKey(type.getId())) {
+                RoomTypeDTO typeDTO = new RoomTypeDTO();
+                typeDTO.setId(type.getId());
+                typeDTO.setName(type.getName());
+                typeDTO.setDescription(type.getDescription());
+                typeDTO.setPrice(type.getPrice());
+                typeDTO.setMaxGuests(type.getMaxGuests());
+                typeDTO.setDoubleBed(type.getDoubleBed());
+                typeDTO.setArea(type.getArea());
+                typeDTO.setIsAvailable(type.getIsAvailable());
+                typeDTO.setRoomImage(type.getRoomImage());
+                typeDTO.setAmenities(roomTypeAmenityRepository.findAmenityNamesByRoomTypeId(type.getId()));
+                int available = roomRepository.countAvailableRooms(type.getId(), hotelId, checkIn, checkOut);
+                typeDTO.setAvailableRooms(available);
+                roomTypeMap.put(type.getId(), typeDTO);
+            }
+        }
+        return new ArrayList<>(roomTypeMap.values());
     }
 }

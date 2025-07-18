@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-// import '../models/user.dart';
+import '../models/user.dart';
 
 class AuthService {
   static const _baseUrl = 'http://localhost:8080/api';
@@ -49,5 +49,55 @@ class AuthService {
 
   Future<String?> getToken() async {
     return await _storage.read(key: 'token');
+  }
+
+  Future<User?> getCurrentUser() async {
+    final token = await getToken();
+    if (token == null) return null;
+    
+    try {
+      final response = await http.get(
+        Uri.parse('$_baseUrl/login/me'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+      
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return User.fromJson(data);
+      }
+    } catch (e) {
+      print('Error getting current user: $e');
+    }
+    return null;
+  }
+
+  Future<User?> updateCurrentUser({
+    String? fullName,
+    String? phone,
+    String? address,
+    String? dateOfBirth,
+  }) async {
+    final token = await getToken();
+    if (token == null) return null;
+    final response = await http.put(
+      Uri.parse('http://localhost:8080/api/users/me'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
+        'fullName': fullName,
+        'phone': phone,
+        'address': address,
+        'dateOfBirth': dateOfBirth,
+      }),
+    );
+    if (response.statusCode == 200) {
+      return User.fromJson(json.decode(response.body));
+    }
+    return null;
   }
 }

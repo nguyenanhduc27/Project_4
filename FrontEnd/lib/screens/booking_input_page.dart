@@ -5,6 +5,8 @@ import '../models/RoomOption.dart';
 import '../widgets/custom_header.dart';
 import '../widgets/custom_footer.dart';
 import 'payment_page.dart';
+import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
 
 class BookingInputPage extends StatefulWidget {
   final Hotel hotel;
@@ -54,6 +56,22 @@ class _BookingInputPageState extends State<BookingInputPage> {
     return _calculateTotalPrice() * 0.10; // 10% tax
   }
 
+  @override
+  void initState() {
+    super.initState();
+    // Lấy user info từ AuthProvider nếu đã đăng nhập
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      if (authProvider.isLoggedIn && authProvider.user != null) {
+        setState(() {
+          _fullNameController.text = authProvider.user!.fullName ?? '';
+          _emailController.text = authProvider.user!.email;
+          _phoneController.text = authProvider.user!.phone ?? '';
+        });
+      }
+    });
+  }
+
   void _completeBooking() {
     if (!_formKey.currentState!.validate() || _calculateNights() <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -64,6 +82,7 @@ class _BookingInputPageState extends State<BookingInputPage> {
       return;
     }
 
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final totalAmount = _calculateTotalPrice() + _calculateTax();
 
     // Chuẩn bị object bookingData
@@ -80,14 +99,14 @@ class _BookingInputPageState extends State<BookingInputPage> {
         'note': _specialRequestController.text,
       },
       'rooms': widget.bookingRooms.map((item) => {
-        'roomId': item['room'].id, // Đây thực tế là roomTypeId
+        'roomTypeId': item['room'].id, // Đúng: id này là roomTypeId
         'quantity': item['quantity'],
         'price': item['room'].price,
-        'room': item['room'].toJson(), // Thêm thông tin đầy đủ của room
+        'room': item['room'].toJson(),
       }).toList(),
       'numberOfGuests': widget.numberOfGuests,
       'numberOfRooms': widget.numberOfRooms,
-      // 'userId': null // Nếu có đăng nhập thì truyền userId, không thì null
+      'userId': authProvider.isLoggedIn ? authProvider.userId : null,
     };
 
     Navigator.push(

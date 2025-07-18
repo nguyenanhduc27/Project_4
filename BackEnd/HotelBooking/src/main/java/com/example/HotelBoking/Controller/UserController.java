@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @RestController
 @RequestMapping("/api/users")
@@ -45,5 +47,15 @@ public class UserController {
     public String deleteUser(@PathVariable Long id) {
         boolean deleted = userService.delete(id);
         return deleted ? "Xoá thành công!" : "Không tìm thấy user để xoá!";
+    }
+
+    // Cập nhật thông tin cá nhân của user hiện tại
+    @PutMapping("/me")
+    public User updateOwnInfo(@RequestBody UserDTO dto) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        User user = userService.findByEmail(email);
+        if (user == null) throw new RuntimeException("User not found");
+        return userService.update(user.getId(), dto);
     }
 }

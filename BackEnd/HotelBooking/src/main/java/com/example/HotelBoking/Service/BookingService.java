@@ -121,20 +121,13 @@ public class BookingService {
             if (dto.getRooms() == null || dto.getRooms().isEmpty()) {
                 throw new IllegalArgumentException("Phải chọn ít nhất một phòng");
             }
-            
-            // Validate từng room
+            // Validate cơ bản từng room (chỉ check dữ liệu, không truy cập DB)
             for (BookingDetailDTO roomDetail : dto.getRooms()) {
-                if (roomDetail.getRoomId() == null) {
-                    throw new IllegalArgumentException("Room ID không được để trống");
-                }
                 if (roomDetail.getQuantity() == null || roomDetail.getQuantity() <= 0) {
                     throw new IllegalArgumentException("Số lượng phòng phải lớn hơn 0");
                 }
-                
-                // Kiểm tra room có tồn tại không
-                Room room = roomRepo.findById(roomDetail.getRoomId().intValue()).orElse(null);
-                if (room == null) {
-                    throw new IllegalArgumentException("Phòng với ID " + roomDetail.getRoomId() + " không tồn tại");
+                if (roomDetail.getRoomId() == null && roomDetail.getRoomTypeId() == null) {
+                    throw new IllegalArgumentException("Cần truyền roomId hoặc roomTypeId");
                 }
             }
             
@@ -150,23 +143,49 @@ public class BookingService {
             System.out.println("Bắt đầu lưu booking details...");
             try {
                 for (BookingDetailDTO roomDetail : dto.getRooms()) {
-                    Room room = roomRepo.findById(roomDetail.getRoomId().intValue()).orElse(null);
-                    if (room != null) {
-                        // Tính số đêm
+                    if (roomDetail.getRoomId() != null) {
+                        Room room = roomRepo.findById(roomDetail.getRoomId().intValue()).orElse(null);
+                        if (room != null) {
+                            boolean isBooked = bookingDetailRepo.existsActiveBooking(
+                                room.getId(),
+                                java.util.List.of(BookingStatus.PENDING, BookingStatus.Paid),
+                                dto.getCheckIn(),
+                                dto.getCheckOut()
+                            );
+                            if (isBooked) {
+                                throw new IllegalArgumentException("Phòng với ID " + room.getId() + " đã được đặt trong khoảng ngày này");
+                            }
+                            long nights = ChronoUnit.DAYS.between(dto.getCheckIn(), dto.getCheckOut());
+                            for (int i = 0; i < roomDetail.getQuantity(); i++) {
+                                BookingDetail detail = new BookingDetail();
+                                detail.setBooking(savedBooking);
+                                detail.setRoom(room);
+                                detail.setNights((int) nights);
+                                detail.setPrice(roomDetail.getPrice());
+                                bookingDetailRepo.save(detail);
+                            }
+                        }
+                    } else {
+                        Integer hotelId = dto.getHotelId() != null ? dto.getHotelId().intValue() : null;
+                        Integer roomTypeId = roomDetail.getRoomTypeId() != null ? roomDetail.getRoomTypeId().intValue() : null;
+                        if (hotelId == null || roomTypeId == null) {
+                            throw new IllegalArgumentException("Thiếu hotelId hoặc roomTypeId để tự động chọn phòng");
+                        }
+                        List<Room> availableRooms = roomRepo.findAvailableRooms(
+                            roomTypeId, hotelId, dto.getCheckIn(), dto.getCheckOut()
+                        );
+                        if (availableRooms.size() < roomDetail.getQuantity()) {
+                            throw new IllegalArgumentException("Không đủ phòng loại này còn trống");
+                        }
                         long nights = ChronoUnit.DAYS.between(dto.getCheckIn(), dto.getCheckOut());
-                        
-                        // Tạo booking detail cho mỗi phòng
                         for (int i = 0; i < roomDetail.getQuantity(); i++) {
+                            Room room = availableRooms.get(i);
                             BookingDetail detail = new BookingDetail();
                             detail.setBooking(savedBooking);
                             detail.setRoom(room);
                             detail.setNights((int) nights);
-                            // Không set total vì đây là generated column
-                            System.out.println(">>> Đang xử lý roomId: " + roomDetail.getRoomId());
-                            System.out.println("    quantity: " + roomDetail.getQuantity());
-
+                            detail.setPrice(roomDetail.getPrice());
                             bookingDetailRepo.save(detail);
-                            System.out.println(">>> ĐÃ LƯU booking_detail CHO roomId = " + room.getId());
                         }
                     }
                 }
@@ -177,9 +196,9 @@ public class BookingService {
                 // Không throw exception vì booking đã được lưu thành công
             }
 
-            // Lưu contact nếu có
+            // Lưu contact nếu có hoặc tự động lấy từ user nếu contact null và userId có
             if (dto.getContact() != null) {
-                System.out.println("Bắt đầu lưu contact...");
+                System.out.println("Bắt đầu lưu contact từ DTO...");
                 try {
                     BookingContact contact = new BookingContact();
                     contact.setBooking(savedBooking);
@@ -194,6 +213,29 @@ public class BookingService {
                 } catch (Exception e) {
                     System.err.println("Lỗi khi lưu contact: " + e.getMessage());
                     // Không throw exception vì booking đã được lưu thành công
+                }
+            } else if (dto.getUserId() != null) {
+                // Nếu contact null nhưng userId có, tự động lấy thông tin user
+                System.out.println("Tự động lấy thông tin liên hệ từ user để lưu contact...");
+                try {
+                    var userOpt = userRepo.findById(dto.getUserId());
+                    if (userOpt.isPresent()) {
+                        var user = userOpt.get();
+                        BookingContact contact = new BookingContact();
+                        contact.setBooking(savedBooking);
+                        contact.setFullName(user.getFullName());
+                        contact.setEmail(user.getEmail());
+                        contact.setPhone(user.getPhone());
+                        contact.setNote("");
+                        contact.setCreatedAt(LocalDateTime.now());
+                        contact.setUpdatedAt(LocalDateTime.now());
+                        contactRepo.save(contact);
+                        System.out.println("Đã lưu contact từ user thành công");
+                    } else {
+                        System.err.println("Không tìm thấy user để lưu contact!");
+                    }
+                } catch (Exception e) {
+                    System.err.println("Lỗi khi lưu contact từ user: " + e.getMessage());
                 }
             }
 

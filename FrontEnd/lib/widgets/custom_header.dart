@@ -97,26 +97,6 @@ class CustomHeader extends StatelessWidget {
                               ),
                             ),
                           ),
-                          Container(
-                            width: 1,
-                            height: 24,
-                            color: Color(0xFF424242),
-                            margin: EdgeInsets.only(left: 28),
-                          ),
-                          SizedBox(width: 32),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pushNamed(context, '/signup');
-                            },
-                            child: Text(
-                              'Sign Up',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF424242),
-                              ),
-                            ),
-                          ),
                         ],
                       );
                     }

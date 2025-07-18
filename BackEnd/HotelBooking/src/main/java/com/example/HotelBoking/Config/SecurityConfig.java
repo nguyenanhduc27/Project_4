@@ -45,7 +45,9 @@ public class SecurityConfig {
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/hotels/**").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/rooms/**").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/uploads/**").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/users/**").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/bookings").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/users/me").authenticated()
                         .anyRequest().authenticated()
 
 

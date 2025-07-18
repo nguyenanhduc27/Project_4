@@ -1,6 +1,7 @@
 package com.example.HotelBoking.Controller;
 
 import com.example.HotelBoking.DTO.RoomDTO;
+import com.example.HotelBoking.DTO.RoomTypeDTO;
 import com.example.HotelBoking.Service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -51,6 +52,26 @@ public class RoomController {
         if (checkInDate == null) checkInDate = LocalDate.now();
         if (checkOutDate == null) checkOutDate = checkInDate.plusDays(1);
         return roomService.getRoomsByHotelId(hotelId, checkInDate, checkOutDate);
+    }
+
+    // Lấy danh sách loại phòng theo khách sạn (group by room type, trả về số lượng còn trống)
+    @GetMapping("/hotel/{hotelId}/room-types")
+    public List<RoomTypeDTO> getRoomTypesByHotel(
+            @PathVariable Integer hotelId,
+            @RequestParam(required = false) String checkIn,
+            @RequestParam(required = false) String checkOut) {
+        LocalDate checkInDate = null;
+        LocalDate checkOutDate = null;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        try {
+            if (checkIn != null) checkInDate = LocalDate.parse(checkIn, formatter);
+            if (checkOut != null) checkOutDate = LocalDate.parse(checkOut, formatter);
+        } catch (Exception e) {
+            // Xử lý lỗi parse date nếu cần
+        }
+        if (checkInDate == null) checkInDate = LocalDate.now();
+        if (checkOutDate == null) checkOutDate = checkInDate.plusDays(1);
+        return roomService.getRoomTypesByHotelId(hotelId, checkInDate, checkOutDate);
     }
 
     // Thêm phòng mới

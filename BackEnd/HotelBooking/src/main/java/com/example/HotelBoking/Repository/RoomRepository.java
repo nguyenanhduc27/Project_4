@@ -24,4 +24,12 @@ public interface RoomRepository extends JpaRepository<Room, Integer> {
             "SELECT bd.room.id FROM BookingDetail bd JOIN bd.booking b " +
             "WHERE b.status <> 'Cancelled' AND (b.checkIn < :checkOut AND b.checkOut > :checkIn))")
     int countAvailableRooms(@Param("roomTypeId") Integer roomTypeId, @Param("hotelId") Integer hotelId, @Param("checkIn") LocalDate checkIn, @Param("checkOut") LocalDate checkOut);
+
+    @Query("SELECT r FROM Room r WHERE r.roomType.id = :roomTypeId AND r.hotel.id = :hotelId AND r.id NOT IN (" +
+            "SELECT bd.room.id FROM BookingDetail bd JOIN bd.booking b " +
+            "WHERE b.status <> 'Cancelled' AND (b.checkIn < :checkOut AND b.checkOut > :checkIn))")
+    List<Room> findAvailableRooms(@Param("roomTypeId") Integer roomTypeId,
+                                  @Param("hotelId") Integer hotelId,
+                                  @Param("checkIn") LocalDate checkIn,
+                                  @Param("checkOut") LocalDate checkOut);
 }

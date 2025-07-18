@@ -3,7 +3,7 @@ import '../models/room.dart';
 import '../utils/url_helper.dart';
 
 class RoomListWidget extends StatefulWidget {
-  final List<Room> rooms;
+  final List<RoomType> rooms;
   final bool isLoading;
   final String? error;
   final void Function()? onRetry;
@@ -88,30 +88,73 @@ class _RoomListWidgetState extends State<RoomListWidget> {
                         children: roomType.amenities.map((amenity) {
                           IconData icon = Icons.check_circle;
                           switch (amenity) {
+                            case 'Ban công':
+                            case 'Ban công riêng':
+                              icon = Icons.balcony;
+                              break;
+                            case 'Điều hòa':
+                            case 'Điều hòa không khí':
+                              icon = Icons.ac_unit;
+                              break;
+                            case 'Bếp':
+                            case 'Bếp riêng':
+                            case 'Bếp đầy đủ tiện nghi':
+                              icon = Icons.kitchen;
+                              break;
+                            case 'Máy giặt':
+                              icon = Icons.local_laundry_service;
+                              break;
+                            case '2 Phòng ngủ':
+                            case '3 Phòng ngủ':
+                            case 'Căn hộ nguyên căn':
+                              icon = Icons.apartment;
+                              break;
+                            case 'WiFi miễn phí':
                             case 'Wi-Fi miễn phí':
                               icon = Icons.wifi;
+                              break;
+                            case 'Phòng không hút thuốc':
+                              icon = Icons.smoke_free;
+                              break;
+                            case 'Thang máy':
+                              icon = Icons.elevator;
+                              break;
+                            case 'Phòng gia đình':
+                              icon = Icons.family_restroom;
+                              break;
+                            case 'Phòng ăn riêng':
+                              icon = Icons.restaurant;
+                              break;
+                            case 'Bồn tắm':
+                              icon = Icons.bathtub;
+                              break;
+                            case 'View thành phố':
+                            case 'Nhìn ra thành phố':
+                              icon = Icons.location_city;
+                              break;
+                            case 'Nhìn ra hồ':
+                              icon = Icons.water;
+                              break;
+                            case 'Nhìn ra vườn':
+                              icon = Icons.park;
+                              break;
+                            case 'Phòng tắm riêng':
+                              icon = Icons.shower;
                               break;
                             case 'TV màn hình phẳng':
                               icon = Icons.tv;
                               break;
-                            case 'Điều hòa':
-                              icon = Icons.ac_unit;
-                              break;
-                            case 'Máy sấy tóc':
-                              icon = Icons.dry_cleaning;
-                              break;
-                            case 'Mini bar':
-                              icon = Icons.local_bar;
-                              break;
-                            case 'Bồn tắm':
-                              icon = Icons.hot_tub;
-                              break;
-                            case 'Ban công riêng':
-                              icon = Icons.balcony;
+                            case 'Hệ thống cách âm':
+                              icon = Icons.volume_off;
                               break;
                             case 'Dịch vụ phòng':
                               icon = Icons.room_service;
                               break;
+                            case '106 m²':
+                              icon = Icons.square_foot;
+                              break;
+                            default:
+                              icon = Icons.check_circle;
                           }
                           return _amenityTag(icon, amenity);
                         }).toList(),
@@ -125,25 +168,6 @@ class _RoomListWidgetState extends State<RoomListWidget> {
                             fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 20),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                          onPressed: () {
-                            Navigator.pop(context);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Đã đặt phòng ${roomType.name} thành công!')),
-                            );
-                          },
-                          child: const Text('Đặt ngay', style: TextStyle(fontSize: 16)),
-                        ),
-                      )
                     ],
                   ),
                 )
@@ -199,15 +223,7 @@ class _RoomListWidgetState extends State<RoomListWidget> {
         child: Text('Không có phòng nào cho khách sạn này'),
       );
     }
-    // Group rooms by roomType.id, chỉ lấy 1 room đại diện cho mỗi loại phòng
-    final Map<int, Room> uniqueRoomTypes = {};
-    for (var room in widget.rooms) {
-      final roomType = room.roomType;
-      if (roomType != null && !uniqueRoomTypes.containsKey(roomType.id)) {
-        uniqueRoomTypes[roomType.id] = room;
-      }
-    }
-    final List<Room> displayRooms = uniqueRoomTypes.values.toList();
+    final List<RoomType> displayRoomTypes = widget.rooms;
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -215,11 +231,9 @@ class _RoomListWidgetState extends State<RoomListWidget> {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
-        children: displayRooms.asMap().entries.map((entry) {
+        children: displayRoomTypes.asMap().entries.map((entry) {
           final index = entry.key;
-          final room = entry.value;
-          final roomType = room.roomType;
-          if (roomType == null) return const SizedBox.shrink();
+          final roomType = entry.value;
           final int selectedQuantity = selectedQuantities[roomType.id] ?? 0;
           return Column(
             children: [
@@ -254,114 +268,156 @@ class _RoomListWidgetState extends State<RoomListWidget> {
                     ),
                     const SizedBox(width: 16),
                     Expanded(
-                      flex: 3,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            roomType.name,
-                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blueAccent),
-                          ),
-                          GestureDetector(
-                            onTap: () => _showRoomDetailPopup(roomType, index),
-                            child: MouseRegion(
-                              cursor: SystemMouseCursors.click,
-                              child: Text(
-                                'Xem chi tiết',
-                                style: TextStyle(
-                                  color: Colors.blue,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w500,
-                                  decoration: TextDecoration.none, // Không gạch chân
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Giường: ${roomType.doubleBed ?? 1} giường đôi',
-                            style: const TextStyle(fontSize: 14, color: Colors.grey),
-                          ),
-                          Text(
-                            'Số khách: ${roomType.maxGuests}',
-                            style: const TextStyle(fontSize: 14, color: Colors.grey),
-                          ),
-                          if (roomType.area != null)
-                            Text(
-                              'Diện tích: ${roomType.area}m²',
-                              style: const TextStyle(fontSize: 14, color: Colors.grey),
-                            ),
-                          const SizedBox(height: 8),
-                          Wrap(
-                            spacing: 8,
+                          Row(
                             children: [
-                              if (roomType.amenities.contains('Wi-Fi miễn phí'))
-                                _amenityTag(Icons.wifi, 'Wifi miễn phí'),
-                              if (roomType.amenities.contains('TV màn hình phẳng'))
-                                _amenityTag(Icons.tv, 'TV màn hình phẳng'),
-                              if (roomType.amenities.contains('Điều hòa'))
-                                _amenityTag(Icons.ac_unit, 'Điều hòa'),
-                              if (roomType.amenities.contains('Máy sấy tóc'))
-                                _amenityTag(Icons.dry_cleaning, 'Máy sấy tóc'),
-                              if (roomType.amenities.contains('Mini bar'))
-                                _amenityTag(Icons.local_bar, 'Mini bar'),
-                              if (roomType.amenities.contains('Bồn tắm'))
-                                _amenityTag(Icons.hot_tub, 'Bồn tắm'),
-                              if (roomType.amenities.contains('Ban công riêng'))
-                                _amenityTag(Icons.balcony, 'Ban công riêng'),
-                              if (roomType.amenities.contains('Dịch vụ phòng'))
-                                _amenityTag(Icons.room_service, 'Dịch vụ phòng'),
+                              Text(
+                                roomType.name,
+                                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(width: 8),
+                              TextButton(
+                                onPressed: () => _showRoomDetailPopup(roomType, index),
+                                child: const Text('Xem chi tiết'),
+                              ),
                             ],
                           ),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      flex: 2,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            '\$${roomType.price.toStringAsFixed(0)}',
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.blue,
-                            ),
-                          ),
-                          const Text(
-                            'mỗi đêm, bao gồm thuế',
-                            style: TextStyle(fontSize: 12, color: Colors.grey),
+                          Text('Giường: ${roomType.doubleBed ?? 1} giường đôi'),
+                          Text('Số khách tối đa: ${roomType.maxGuests} người'),
+                          if (roomType.area != null)
+                            Text('Diện tích: ${roomType.area}m²'),
+                          Wrap(
+                            spacing: 10,
+                            runSpacing: 10,
+                            children: roomType.amenities.map((amenity) {
+                              IconData icon = Icons.check_circle;
+                              switch (amenity) {
+                                case 'Ban công':
+                                case 'Ban công riêng':
+                                  icon = Icons.balcony;
+                                  break;
+                                case 'Điều hòa':
+                                case 'Điều hòa không khí':
+                                  icon = Icons.ac_unit;
+                                  break;
+                                case 'Bếp':
+                                case 'Bếp riêng':
+                                case 'Bếp đầy đủ tiện nghi':
+                                  icon = Icons.kitchen;
+                                  break;
+                                case 'Máy giặt':
+                                  icon = Icons.local_laundry_service;
+                                  break;
+                                case '2 Phòng ngủ':
+                                case '3 Phòng ngủ':
+                                case 'Căn hộ nguyên căn':
+                                  icon = Icons.apartment;
+                                  break;
+                                case 'WiFi miễn phí':
+                                case 'Wi-Fi miễn phí':
+                                  icon = Icons.wifi;
+                                  break;
+                                case 'Phòng không hút thuốc':
+                                  icon = Icons.smoke_free;
+                                  break;
+                                case 'Thang máy':
+                                  icon = Icons.elevator;
+                                  break;
+                                case 'Phòng gia đình':
+                                  icon = Icons.family_restroom;
+                                  break;
+                                case 'Phòng ăn riêng':
+                                  icon = Icons.restaurant;
+                                  break;
+                                case 'Bồn tắm':
+                                  icon = Icons.bathtub;
+                                  break;
+                                case 'View thành phố':
+                                case 'Nhìn ra thành phố':
+                                  icon = Icons.location_city;
+                                  break;
+                                case 'Nhìn ra hồ':
+                                  icon = Icons.water;
+                                  break;
+                                case 'Nhìn ra vườn':
+                                  icon = Icons.park;
+                                  break;
+                                case 'Phòng tắm riêng':
+                                  icon = Icons.shower;
+                                  break;
+                                case 'TV màn hình phẳng':
+                                  icon = Icons.tv;
+                                  break;
+                                case 'Hệ thống cách âm':
+                                  icon = Icons.volume_off;
+                                  break;
+                                case 'Dịch vụ phòng':
+                                  icon = Icons.room_service;
+                                  break;
+                                case '106 m²':
+                                  icon = Icons.square_foot;
+                                  break;
+                                default:
+                                  icon = Icons.check_circle;
+                              }
+                              return _amenityTag(icon, amenity);
+                            }).toList(),
                           ),
                           const SizedBox(height: 8),
-                          if (roomType.isAvailable == true)
-                            const Text(
-                              'Còn phòng',
-                              style: TextStyle(fontSize: 12, color: Colors.green),
-                            )
-                          else
-                            const Text(
-                              'Hết phòng',
-                              style: TextStyle(fontSize: 12, color: Colors.red),
-                            ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      width: 150,
-                      child: Column(
-                        children: [
-                          DropdownButton<int>(
-                            value: selectedQuantity,
-                            items: [for (int i = 0; i <= roomType.availableRooms; i++) DropdownMenuItem(value: i, child: Text(' $i phòng'))],
-                            onChanged: (value) {
-                              setState(() {
-                                selectedQuantities[roomType.id] = value ?? 0;
-                              });
-                              if (widget.onAddToCart != null) {
-                                widget.onAddToCart!(roomType, value ?? 0);
-                              }
-                            },
+                          Text(
+                            'Còn lại: ${roomType.availableRooms} phòng',
+                            style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            '\$${roomType.price.toStringAsFixed(0)} /đêm (gồm thuế)',
+                            style: const TextStyle(fontSize: 16, color: Colors.blue, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.remove),
+                                onPressed: selectedQuantity > 0
+                                    ? () {
+                                        setState(() {
+                                          selectedQuantities[roomType.id] = selectedQuantity - 1;
+                                        });
+                                        if (widget.onAddToCart != null) {
+                                          widget.onAddToCart!(roomType, selectedQuantity - 1);
+                                        }
+                                      }
+                                    : null,
+                              ),
+                              Text('$selectedQuantity', style: const TextStyle(fontSize: 16)),
+                              IconButton(
+                                icon: const Icon(Icons.add),
+                                onPressed: selectedQuantity < (roomType.availableRooms)
+                                    ? () {
+                                        setState(() {
+                                          selectedQuantities[roomType.id] = selectedQuantity + 1;
+                                        });
+                                        if (widget.onAddToCart != null) {
+                                          widget.onAddToCart!(roomType, selectedQuantity + 1);
+                                        }
+                                      }
+                                    : null,
+                              ),
+                              const SizedBox(width: 8),
+                              ElevatedButton(
+                                onPressed: selectedQuantity > 0
+                                    ? () {
+                                        // Có thể xử lý đặt phòng ở đây nếu muốn
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(content: Text('Đã thêm ${roomType.name} x $selectedQuantity vào giỏ!')),
+                                        );
+                                      }
+                                    : null,
+                                child: const Text('Chọn'),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -369,8 +425,7 @@ class _RoomListWidgetState extends State<RoomListWidget> {
                   ],
                 ),
               ),
-              if (index < displayRooms.length - 1)
-                Divider(height: 1, color: Colors.grey.shade300),
+              const Divider(height: 1),
             ],
           );
         }).toList(),
