@@ -10,6 +10,8 @@ class Hotel {
   final String? thumbnailUrl;
   final List<String> imageUrls;
   final List<String>? amenities;
+  final double latitude;   // Thêm dòng này
+  final double longitude;  // Thêm dòng này
 
   Hotel({
     required this.id,
@@ -21,6 +23,8 @@ class Hotel {
     this.thumbnailUrl,
     required this.imageUrls,
     this.amenities,
+    required this.latitude,   // Thêm dòng này
+    required this.longitude,  // Thêm dòng này
   });
 
   factory Hotel.fromJson(Map<String, dynamic> json) {
@@ -36,6 +40,8 @@ class Hotel {
           .map((e) => UrlHelper.normalizeImageUrl(e as String))
           .toList(),
       amenities: (json['amenities'] as List<dynamic>? ?? []).cast<String>(),
+      latitude: (json['latitude'] as num?)?.toDouble() ?? 0.0,    // Thêm dòng này
+      longitude: (json['longitude'] as num?)?.toDouble() ?? 0.0,  // Thêm dòng này
     );
   }
 
@@ -50,6 +56,8 @@ class Hotel {
       'thumbnailUrl': thumbnailUrl,
       'imageUrls': imageUrls,
       'amenities': amenities,
+      'latitude': latitude,     // Thêm dòng này
+      'longitude': longitude,   // Thêm dòng này
     };
   }
 }

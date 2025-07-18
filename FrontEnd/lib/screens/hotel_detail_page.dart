@@ -36,21 +36,18 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
   bool isLoadingRooms = true;
   String? roomsError;
 
-  // Giỏ phòng: List<Map> với roomType, quantity
   List<Map<String, dynamic>> cart = [];
 
   HotelMarker? selectedHotel;
 
   void _addToCart(RoomType roomType, int quantity) {
     setState(() {
-      // Nếu đã có loại phòng này trong giỏ thì cập nhật số lượng
       final idx = cart.indexWhere((item) => item['roomType'].id == roomType.id);
       if (idx >= 0) {
         cart[idx]['quantity'] = quantity;
       } else {
         cart.add({'roomType': roomType, 'quantity': quantity});
       }
-      // Nếu quantity = 0 thì xóa khỏi giỏ
       cart.removeWhere((item) => item['quantity'] == 0);
     });
   }
@@ -76,7 +73,6 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
             height: 600,
             child: Column(
               children: [
-                // Slider ảnh phòng
                 SizedBox(
                   height: 280,
                   child: roomType.roomImage != null
@@ -96,7 +92,6 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
                         ),
                 ),
                 const SizedBox(height: 16),
-                // Thông tin phòng
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Column(
@@ -107,10 +102,17 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
                         style: const TextStyle(
                             fontSize: 22, fontWeight: FontWeight.bold),
                       ),
-                      TextButton(
-                        onPressed: () => _showRoomDetailPopup(roomType, index),
-                        child: const Text('Xem chi tiết',
-                            style: TextStyle(color: Colors.blue)),
+                      InkWell(
+                        onTap: () => _showRoomDetailPopup(roomType, index),
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 8.0),
+                          child: Text(
+                            'Xem chi tiết',
+                            style: TextStyle(
+                                color: Colors.blue,
+                                decoration: TextDecoration.none),
+                          ),
+                        ),
                       ),
                       const SizedBox(height: 8),
                       Text('Giường: ${roomType.doubleBed ?? 1} giường đôi'),
@@ -122,7 +124,7 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
                         spacing: 10,
                         runSpacing: 10,
                         children: roomType.amenities.map((amenity) {
-                          IconData icon = Icons.check_circle; // default icon
+                          IconData icon = Icons.check_circle;
                           switch (amenity) {
                             case 'Wi-Fi miễn phí':
                               icon = Icons.wifi;
@@ -154,7 +156,7 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        ' \$${roomType.price.toStringAsFixed(0)} /đêm (gồm thuế)',
+                        '\$${roomType.price.toStringAsFixed(0)} /đêm (gồm thuế)',
                         style: const TextStyle(
                             fontSize: 20,
                             color: Colors.blue,
@@ -168,8 +170,7 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
                             backgroundColor: Colors.blue,
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
+                                borderRadius: BorderRadius.circular(8)),
                           ),
                           onPressed: () {
                             Navigator.pop(context);
@@ -231,7 +232,6 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
                             userAgentPackageName:
                                 'com.example.hotel_booking_app',
                           ),
-                          // Map markers will be added here when we have real hotel data
                         ],
                       ),
                     ),
@@ -342,10 +342,8 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
         children: [
           Icon(icon, size: 16, color: Colors.blueAccent),
           const SizedBox(width: 4),
-          Text(
-            label,
-            style: const TextStyle(fontSize: 12, color: Colors.blueAccent),
-          ),
+          Text(label,
+              style: const TextStyle(fontSize: 12, color: Colors.blueAccent)),
         ],
       ),
     );
@@ -377,10 +375,8 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
         children: [
           Icon(icon, size: 24, color: Colors.black87),
           const SizedBox(width: 8),
-          Text(
-            label,
-            style: const TextStyle(fontSize: 14, color: Colors.black87),
-          ),
+          Text(label,
+              style: const TextStyle(fontSize: 14, color: Colors.black87)),
         ],
       ),
     );
@@ -423,7 +419,8 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final roomTypesToShow = roomTypes.where((rt) => (rt.availableRooms) > 0).toList();
+    final roomTypesToShow =
+        roomTypes.where((rt) => (rt.availableRooms) > 0).toList();
     return Scaffold(
       backgroundColor: Colors.white,
       body: LayoutBuilder(
@@ -444,10 +441,9 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
                   child: const Text(
                     'Hotel Details',
                     style: TextStyle(
-                      fontSize: 36,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
+                        fontSize: 36,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
                   ),
                 ),
               ),
@@ -479,13 +475,11 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
                                           ? Image.network(
                                               widget.hotel.imageUrls[0],
                                               height: 300,
-                                              fit: BoxFit.cover,
-                                            )
+                                              fit: BoxFit.cover)
                                           : Image.asset(
                                               'images/resort-title-bg.jpg',
                                               height: 300,
-                                              fit: BoxFit.cover,
-                                            ),
+                                              fit: BoxFit.cover),
                                     ),
                                   ),
                                 ),
@@ -515,11 +509,10 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
                                                   borderRadius:
                                                       BorderRadius.circular(8),
                                                   child: Image.network(
-                                                    widget.hotel.imageUrls[i],
-                                                    height: 146,
-                                                    width: 146,
-                                                    fit: BoxFit.cover,
-                                                  ),
+                                                      widget.hotel.imageUrls[i],
+                                                      height: 146,
+                                                      width: 146,
+                                                      fit: BoxFit.cover),
                                                 ),
                                               ),
                                             ),
@@ -558,11 +551,10 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
                                                   borderRadius:
                                                       BorderRadius.circular(8),
                                                   child: Image.network(
-                                                    widget.hotel.imageUrls[i],
-                                                    height: 146,
-                                                    width: 146,
-                                                    fit: BoxFit.cover,
-                                                  ),
+                                                      widget.hotel.imageUrls[i],
+                                                      height: 146,
+                                                      width: 146,
+                                                      fit: BoxFit.cover),
                                                 ),
                                               ),
                                             ),
@@ -634,8 +626,7 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
                               runSpacing: 16,
                               children:
                                   (widget.hotel.amenities ?? []).map((amenity) {
-                                IconData icon =
-                                    Icons.check_circle; // default icon
+                                IconData icon = Icons.check_circle;
                                 switch (amenity) {
                                   case 'Wi-Fi miễn phí':
                                   case 'WiFi miễn phí':
@@ -661,7 +652,6 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
                                   case 'Ban công':
                                     icon = Icons.balcony;
                                     break;
-                                  case 'Dịch vụ phòng':
                                   case 'Dịch vụ phòng':
                                     icon = Icons.room_service;
                                     break;
@@ -708,12 +698,10 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
                         ),
                       ),
                       const SizedBox(width: 40),
-                      // XÓA BookingCartWidget ở phần cạnh ảnh khách sạn (Row đầu tiên)
                     ],
                   ),
                 ),
               ),
-              // Phần Tùy Chọn Phòng (đặt trước Customer Reviews)
               SliverToBoxAdapter(
                 child: Padding(
                   padding:
@@ -768,7 +756,6 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
                   ),
                 ),
               ),
-              // Phần Customer Reviews (đặt sau Tùy Chọn Phòng)
               SliverToBoxAdapter(
                 child: Padding(
                   padding:
@@ -852,17 +839,17 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
 class BookingCartWidget extends StatelessWidget {
   final List<Map<String, dynamic>> cart;
   final void Function(int roomTypeId) onRemove;
-  final Hotel hotel; // Added hotel parameter
-  final DateTime checkInDate; // Added checkInDate parameter
-  final DateTime checkOutDate; // Added checkOutDate parameter
+  final Hotel hotel;
+  final DateTime checkInDate;
+  final DateTime checkOutDate;
 
   const BookingCartWidget({
     super.key,
     required this.cart,
     required this.onRemove,
-    required this.hotel, // Initialize hotel
-    required this.checkInDate, // Initialize checkInDate
-    required this.checkOutDate, // Initialize checkOutDate
+    required this.hotel,
+    required this.checkInDate,
+    required this.checkOutDate,
   });
 
   @override
@@ -878,17 +865,8 @@ class BookingCartWidget extends StatelessWidget {
         child: const Text('Chưa chọn phòng nào'),
       );
     }
-    // Tính số đêm lưu trú
-    final checkIn = (context
-            .findAncestorStateOfType<_HotelDetailPageState>()
-            ?.widget
-            .checkInDate ??
-        DateTime.now());
-    final checkOut = (context
-            .findAncestorStateOfType<_HotelDetailPageState>()
-            ?.widget
-            .checkOutDate ??
-        DateTime.now().add(const Duration(days: 1)));
+    final checkIn = checkInDate;
+    final checkOut = checkOutDate;
     final int nights = checkOut.difference(checkIn).inDays;
     double total = 0;
     for (var item in cart) {
@@ -932,12 +910,8 @@ class BookingCartWidget extends StatelessWidget {
             child: ElevatedButton(
               onPressed: () {
                 try {
-                  // Tính tổng số phòng và tổng số khách nếu cần
                   int totalRooms = cart.fold(
                       0, (sum, item) => sum + ((item['quantity'] ?? 0) as int));
-                  // Nếu có số khách, bạn cũng tính ở đây
-
-                  // Chuyển đổi cart sang danh sách RoomOption hoặc dữ liệu phù hợp với BookingInputPage
                   List<Map<String, dynamic>> bookingRooms = cart
                       .map((item) => {
                             'room': RoomOption(
@@ -962,7 +936,7 @@ class BookingCartWidget extends StatelessWidget {
                         bookingRooms: bookingRooms,
                         checkInDate: checkInDate,
                         checkOutDate: checkOutDate,
-                        numberOfGuests: 1, // hoặc tính tổng số khách nếu có
+                        numberOfGuests: 1,
                         numberOfRooms: totalRooms,
                       ),
                     ),
