@@ -89,7 +89,7 @@ class HotelCard extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => HotelDetailPage(hotel: hotel, checkInDate: checkInDate, checkOutDate: checkOutDate),
+                        builder: (_) => HotelDetailPage(hotel: hotel, checkInDate: checkInDate, checkOutDate: checkOutDate, ),
                       ),
                     );
                   },

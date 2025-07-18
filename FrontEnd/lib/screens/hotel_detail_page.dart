@@ -14,17 +14,21 @@ import '../widgets/room_list.dart';
 import 'package:intl/intl.dart';
 import 'booking_input_page.dart';
 import 'payment_page.dart';
+import 'dart:async';
+import 'package:flutter/gestures.dart';
 
 class HotelDetailPage extends StatefulWidget {
   final Hotel hotel;
   final DateTime checkInDate;
   final DateTime checkOutDate;
+  // XÓA: final List<Hotel> allHotels;
 
   const HotelDetailPage({
     super.key,
     required this.hotel,
     required this.checkInDate,
     required this.checkOutDate,
+    // XÓA: required this.allHotels,
   });
   @override
   State<HotelDetailPage> createState() => _HotelDetailPageState();
@@ -69,25 +73,32 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           child: SizedBox(
-            width: 600,
-            height: 600,
+            width: 340, // nhỏ lại
             child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                SizedBox(
-                  height: 280,
+                ClipRRect(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
                   child: roomType.roomImage != null
                       ? Image.network(
                           roomType.roomImage!,
+                          height: 180,
+                          width: double.infinity,
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
                             return Image.asset(
                               'images/room1.jpg',
+                              height: 180,
+                              width: double.infinity,
                               fit: BoxFit.cover,
                             );
                           },
                         )
                       : Image.asset(
                           'images/room1.jpg',
+                          height: 180,
+                          width: double.infinity,
                           fit: BoxFit.cover,
                         ),
                 ),
@@ -95,34 +106,27 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
                         roomType.name,
                         style: const TextStyle(
-                            fontSize: 22, fontWeight: FontWeight.bold),
-                      ),
-                      InkWell(
-                        onTap: () => _showRoomDetailPopup(roomType, index),
-                        child: const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 8.0),
-                          child: Text(
-                            'Xem chi tiết',
-                            style: TextStyle(
-                                color: Colors.blue,
-                                decoration: TextDecoration.none),
-                          ),
-                        ),
+                            fontSize: 20, fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 8),
-                      Text('Giường: ${roomType.doubleBed ?? 1} giường đôi'),
-                      Text('Số khách tối đa: ${roomType.maxGuests} người'),
+                      Text('Giường: ${roomType.doubleBed ?? 1} giường đôi',
+                          textAlign: TextAlign.center),
+                      Text('Số khách tối đa: ${roomType.maxGuests} người',
+                          textAlign: TextAlign.center),
                       if (roomType.area != null)
-                        Text('Diện tích: ${roomType.area}m²'),
+                        Text('Diện tích: ${roomType.area}m²',
+                            textAlign: TextAlign.center),
                       const SizedBox(height: 12),
                       Wrap(
                         spacing: 10,
                         runSpacing: 10,
+                        alignment: WrapAlignment.center,
                         children: roomType.amenities.map((amenity) {
                           IconData icon = Icons.check_circle;
                           switch (amenity) {
@@ -158,9 +162,10 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
                       Text(
                         '\$${roomType.price.toStringAsFixed(0)} /đêm (gồm thuế)',
                         style: const TextStyle(
-                            fontSize: 20,
+                            fontSize: 18,
                             color: Colors.blue,
                             fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 20),
                       SizedBox(
@@ -196,59 +201,186 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
   }
 
   void _showMapPopup() {
+    final double lat = widget.hotel.latitude ?? 21.0278;
+    final double lng = widget.hotel.longitude ?? 105.8342;
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return Dialog(
-              insetPadding: EdgeInsets.zero,
-              child: Container(
-                width: double.infinity,
-                height: MediaQuery.of(context).size.height * 0.9,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.shade300, width: 1),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Stack(
-                  children: [
-                    ClipRRect(
+        return FutureBuilder<List<Hotel>>(
+          future: _hotelService.fetchHotels(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (snapshot.hasError) {
+              return AlertDialog(
+                title: const Text('Lỗi'),
+                content: Text(
+                    'Không thể tải danh sách khách sạn: \n${snapshot.error}'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Đóng'),
+                  ),
+                ],
+              );
+            }
+            final allHotels = snapshot.data ?? [];
+            bool showHotelInfo = false;
+            int selectedHotelId = widget.hotel.id;
+            // Animation state
+            ValueNotifier<bool> animateCircle = ValueNotifier(false);
+            Timer? timer;
+            void startAnimation() {
+              timer?.cancel();
+              timer = Timer.periodic(const Duration(seconds: 1), (_) {
+                animateCircle.value = !animateCircle.value;
+              });
+            }
+
+            void stopAnimation() {
+              timer?.cancel();
+              animateCircle.value = false;
+            }
+
+            return StatefulBuilder(
+              builder: (context, setState) {
+                return Dialog(
+                  insetPadding: EdgeInsets.zero,
+                  child: Container(
+                    width: double.infinity,
+                    height: MediaQuery.of(context).size.height * 0.9,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade300, width: 1),
                       borderRadius: BorderRadius.circular(15),
-                      child: FlutterMap(
-                        options: MapOptions(
-                          initialCenter: LatLng(21.0278, 105.8342),
-                          initialZoom: 17.0,
-                          onTap: (_, __) {
-                            setState(() {
-                              selectedHotel = null;
-                            });
-                          },
-                        ),
-                        children: [
-                          TileLayer(
-                            urlTemplate:
-                                'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                            subdomains: const ['a', 'b', 'c'],
-                            userAgentPackageName:
-                                'com.example.hotel_booking_app',
+                    ),
+                    child: Stack(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(15),
+                          child: FlutterMap(
+                            options: MapOptions(
+                              initialCenter: LatLng(lat, lng),
+                              initialZoom: 13.0,
+                            ),
+                            children: [
+                              TileLayer(
+                                urlTemplate:
+                                    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                subdomains: const ['a', 'b', 'c'],
+                                userAgentPackageName:
+                                    'com.example.hotel_booking_app',
+                              ),
+                              MarkerLayer(
+                                markers: allHotels
+                                    .where((hotel) =>
+                                        hotel.latitude != null &&
+                                        hotel.longitude != null)
+                                    .map((hotel) {
+                                  bool isSelected = hotel.id == selectedHotelId;
+                                  if (isSelected)
+                                    startAnimation();
+                                  else
+                                    stopAnimation();
+                                  return Marker(
+                                    point: LatLng(hotel.latitude ?? 0,
+                                        hotel.longitude ?? 0),
+                                    width: 60,
+                                    height: 60,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          selectedHotelId = hotel.id;
+                                          showHotelInfo = true;
+                                        });
+                                      },
+                                      child: ValueListenableBuilder<bool>(
+                                        valueListenable: animateCircle,
+                                        builder: (context, animate, _) {
+                                          return Stack(
+                                            alignment: Alignment.center,
+                                            children: [
+                                              if (isSelected && animate)
+                                                Container(
+                                                  width: 48,
+                                                  height: 48,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.blue
+                                                        .withOpacity(0.3),
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                ),
+                                              Container(
+                                                width: 40,
+                                                height: 40,
+                                                decoration: BoxDecoration(
+                                                  color: isSelected
+                                                      ? Colors.blue
+                                                          .withOpacity(0.2)
+                                                      : Colors.grey
+                                                          .withOpacity(0.15),
+                                                  shape: BoxShape.circle,
+                                                ),
+                                              ),
+                                              Icon(
+                                                Icons.location_on,
+                                                color: isSelected
+                                                    ? Colors.red
+                                                    : Colors.blue,
+                                                size: isSelected ? 40 : 32,
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                        // Popup info khách sạn bên trái
+                        if (showHotelInfo)
+                          Positioned(
+                            left: 20,
+                            top: 40,
+                            child: Material(
+                              elevation: 8,
+                              borderRadius: BorderRadius.circular(12),
+                              child: Container(
+                                width: 320,
+                                padding: EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: _buildHotelInfo(
+                                  allHotels.firstWhere(
+                                      (h) => h.id == selectedHotelId),
+                                  () => setState(() => showHotelInfo = false),
+                                ),
+                              ),
+                            ),
+                          ),
+                        // Nút đóng popup bản đồ
+                        Positioned(
+                          top: 10,
+                          right: 10,
+                          child: IconButton(
+                            icon: const Icon(Icons.close,
+                                color: Colors.grey, size: 24),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ),
+                      ],
                     ),
-                    Positioned(
-                      top: 10,
-                      right: 10,
-                      child: IconButton(
-                        icon: const Icon(Icons.close,
-                            color: Colors.grey, size: 24),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+                  ),
+                );
+              },
             );
           },
         );
@@ -417,6 +549,107 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
     return widget.checkOutDate.difference(widget.checkInDate).inDays;
   }
 
+  Widget _buildHotelInfo(Hotel hotel, VoidCallback onClose) {
+    return SizedBox(
+      width: 260,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: hotel.imageUrls.isNotEmpty
+                ? Image.network(
+                    hotel.imageUrls[0],
+                    height: 120,
+                    width: 260,
+                    fit: BoxFit.cover,
+                  )
+                : Image.asset(
+                    'images/resort-title-bg.jpg',
+                    height: 120,
+                    width: 260,
+                    fit: BoxFit.cover,
+                  ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            hotel.name,
+            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 6),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(5, (index) {
+              return Icon(
+                index < hotel.starRating ? Icons.star : Icons.star_border,
+                color: Colors.amber,
+                size: 16,
+              );
+            }),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            '${hotel.address}, ${hotel.city}',
+            style: const TextStyle(fontSize: 13, color: Colors.black87),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                textStyle: const TextStyle(fontSize: 14),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8)),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop(); // Đóng popup
+                if (hotel.id != widget.hotel.id) {
+                  // Nếu chọn khách sạn khác, chuyển sang trang chi tiết khách sạn đó
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => HotelDetailPage(
+                        hotel: hotel,
+                        checkInDate: widget.checkInDate,
+                        checkOutDate: widget.checkOutDate,
+                      ),
+                    ),
+                  );
+                } else {
+                  // Nếu vẫn là khách sạn hiện tại, chỉ scroll xuống list room
+                  _scrollToRoomList();
+                }
+              },
+              child: const Text('Xem phòng trống'),
+            ),
+          ),
+          Align(
+            alignment: Alignment.centerRight,
+            child: IconButton(
+              icon: const Icon(Icons.close, size: 20),
+              onPressed: onClose,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Thêm hàm scroll đến danh sách phòng
+  final GlobalKey _roomListKey = GlobalKey();
+
+  void _scrollToRoomList() {
+    final context = _roomListKey.currentContext;
+    if (context != null) {
+      Scrollable.ensureVisible(context,
+          duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final roomTypesToShow =
@@ -581,24 +814,39 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
                                 style: const TextStyle(
                                     fontSize: 32, fontWeight: FontWeight.bold)),
                             const SizedBox(height: 15),
-                            GestureDetector(
-                              onTap: _showMapPopup,
-                              child: Row(
-                                children: [
-                                  const Icon(Icons.location_on,
-                                      color: Colors.blueAccent),
-                                  const SizedBox(width: 4),
-                                  Expanded(
-                                    child: Text(
-                                      widget.hotel.city.isNotEmpty
-                                          ? widget.hotel.city
-                                          : widget.hotel.address,
+                            // Địa chỉ khách sạn (có cả thành phố), có thể bấm vào để mở map
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const Icon(Icons.location_on,
+                                    color: Colors.blueAccent),
+                                const SizedBox(width: 4),
+                                Flexible(
+                                  child: RichText(
+                                    text: TextSpan(
                                       style: const TextStyle(
-                                          color: Colors.blueAccent),
+                                        color: Colors.black87,
+                                        fontSize: 16,
+                                      ),
+                                      children: [
+                                        TextSpan(
+                                          text:
+                                              '${widget.hotel.address}, ${widget.hotel.city} ',
+                                        ),
+                                        TextSpan(
+                                          text: '– Hiển thị bản đồ',
+                                          style: const TextStyle(
+                                            color: Colors.blue,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                          recognizer: TapGestureRecognizer()
+                                            ..onTap = _showMapPopup,
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
                             const SizedBox(height: 30),
                             Text(widget.hotel.description,
@@ -721,6 +969,7 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
                             ),
                             const SizedBox(height: 20),
                             RoomListWidget(
+                              key: _roomListKey,
                               rooms: roomTypesToShow,
                               isLoading: isLoadingRooms,
                               error: roomsError,

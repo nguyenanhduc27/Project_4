@@ -43,18 +43,39 @@ class PaymentPage extends StatelessWidget {
             slivers: [
               SliverToBoxAdapter(child: CustomHeader()),
               SliverToBoxAdapter(
-                child: Container(
-                  height: 200,
-                  decoration: const BoxDecoration(color: Colors.blueGrey),
-                  alignment: Alignment.center,
-                  child: const Text(
-                    'Thanh Toán',
-                    style: TextStyle(
-                      fontSize: 36,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                child: Stack(
+                  children: [
+                    Container(
+                      height: 200,
+                      width: double.infinity,
+                      decoration: const BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage('images/resort-title-bg.jpg'),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
                     ),
-                  ),
+                    Positioned.fill(
+                      child: Center(
+                        child: Text(
+                          'Thanh Toán',
+                          style: TextStyle(
+                            fontSize: 36,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            shadows: [
+                              Shadow(
+                                blurRadius: 8,
+                                color: Colors.black45,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               SliverToBoxAdapter(

@@ -154,12 +154,14 @@ class _HotelSearchPageState extends State<HotelSearchPage> {
                                 SizedBox(
                                   width: 260,
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       const Text(
                                         'Bộ lọc phổ biến',
                                         style: TextStyle(
-                                            fontSize: 18, fontWeight: FontWeight.bold),
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold),
                                       ),
                                       const SizedBox(height: 16),
                                       _buildFilterCheckbox('5 sao'),
@@ -182,82 +184,119 @@ class _HotelSearchPageState extends State<HotelSearchPage> {
                                               padding: EdgeInsets.all(32),
                                               child: Text(
                                                 'Không tìm thấy khách sạn phù hợp.',
-                                                style: TextStyle(fontSize: 18, color: Colors.grey),
+                                                style: TextStyle(
+                                                    fontSize: 18,
+                                                    color: Colors.grey),
                                               ),
                                             )
                                           ]
                                         : filteredHotels.map((hotel) {
                                             return Container(
-                                              margin: const EdgeInsets.only(bottom: 30),
+                                              margin: const EdgeInsets.only(
+                                                  bottom: 30),
                                               padding: const EdgeInsets.all(16),
                                               decoration: BoxDecoration(
                                                 color: Colors.white,
-                                                borderRadius: BorderRadius.circular(12),
-                                                border: Border.all(color: Colors.grey.shade300),
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                                border: Border.all(
+                                                    color:
+                                                        Colors.grey.shade300),
                                                 boxShadow: [
                                                   BoxShadow(
-                                                    color: Colors.black.withOpacity(0.05),
+                                                    color: Colors.black
+                                                        .withOpacity(0.05),
                                                     blurRadius: 8,
                                                     offset: const Offset(0, 4),
                                                   ),
                                                 ],
                                               ),
                                               child: Row(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
                                                 children: [
                                                   // Image
                                                   ClipRRect(
-                                                    borderRadius: BorderRadius.circular(8),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8),
                                                     child: Image.network(
-                                                      UrlHelper.normalizeImageUrl(hotel.thumbnailUrl) ?? 'https://via.placeholder.com/250x170', // hoặc ảnh mặc định
+                                                      UrlHelper.normalizeImageUrl(
+                                                              hotel
+                                                                  .thumbnailUrl) ??
+                                                          'https://via.placeholder.com/250x170', // hoặc ảnh mặc định
                                                       width: 250,
                                                       height: 170,
                                                       fit: BoxFit.cover,
-                                                      errorBuilder: (context, error, stackTrace) => Image.asset('assets/images/default.jpg'),
+                                                      errorBuilder: (context,
+                                                              error,
+                                                              stackTrace) =>
+                                                          Image.asset(
+                                                              'assets/images/default.jpg'),
                                                     ),
                                                   ),
                                                   const SizedBox(width: 24),
                                                   // Info
                                                   Expanded(
                                                     child: Column(
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
                                                       children: [
                                                         Text(
                                                           hotel.name,
-                                                          style: const TextStyle(
+                                                          style:
+                                                              const TextStyle(
                                                             fontSize: 20,
-                                                            fontWeight: FontWeight.bold,
+                                                            fontWeight:
+                                                                FontWeight.bold,
                                                           ),
                                                         ),
-                                                        const SizedBox(height: 8),
+                                                        const SizedBox(
+                                                            height: 8),
                                                         Row(
                                                           children: [
-                                                            const Icon(Icons.place, size: 18),
-                                                            const SizedBox(width: 4),
+                                                            const Icon(
+                                                                Icons.place,
+                                                                size: 18),
+                                                            const SizedBox(
+                                                                width: 4),
                                                             Text(hotel.address),
                                                           ],
                                                         ),
-                                                        const SizedBox(height: 8),
+                                                        const SizedBox(
+                                                            height: 8),
                                                         Row(
-                                                          children: List.generate(5, (index) {
+                                                          children:
+                                                              List.generate(5,
+                                                                  (index) {
                                                             return Icon(
-                                                              index < hotel.starRating
+                                                              index <
+                                                                      hotel
+                                                                          .starRating
                                                                   ? Icons.star
-                                                                  : Icons.star_border,
-                                                              color: Colors.amber,
+                                                                  : Icons
+                                                                      .star_border,
+                                                              color:
+                                                                  Colors.amber,
                                                               size: 18,
                                                             );
                                                           }),
                                                         ),
-                                                        const SizedBox(height: 8),
+                                                        const SizedBox(
+                                                            height: 8),
                                                         Row(
-                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
                                                           children: [
                                                             const Text(
                                                               'Contact for price',
                                                               style: TextStyle(
                                                                 fontSize: 16,
-                                                                fontWeight: FontWeight.bold,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
                                                               ),
                                                             ),
                                                             TextButton(
@@ -265,11 +304,21 @@ class _HotelSearchPageState extends State<HotelSearchPage> {
                                                                 Navigator.push(
                                                                   context,
                                                                   MaterialPageRoute(
-                                                                    builder: (_) => HotelDetailPage(hotel: hotel, checkInDate: widget.checkInDate, checkOutDate: widget.checkOutDate),
+                                                                    builder: (_) => HotelDetailPage(
+                                                                        hotel:
+                                                                            hotel,
+                                                                        checkInDate:
+                                                                            widget
+                                                                                .checkInDate,
+                                                                        checkOutDate:
+                                                                            widget
+                                                                                .checkOutDate,
+                                                                    ),
                                                                   ),
                                                                 );
                                                               },
-                                                              child: const Text('Xem chi tiết →'),
+                                                              child: const Text(
+                                                                  'Xem chi tiết →'),
                                                             ),
                                                           ],
                                                         ),

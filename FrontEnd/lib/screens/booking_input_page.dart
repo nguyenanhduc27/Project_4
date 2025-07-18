@@ -32,10 +32,9 @@ class BookingInputPage extends StatefulWidget {
 
 class _BookingInputPageState extends State<BookingInputPage> {
   final _formKey = GlobalKey<FormState>();
-  final _fullNameController = TextEditingController(text: 'Nguyen Van A');
-  final _emailController =
-      TextEditingController(text: 'nam.bd.2144@aptechlearning.edu.vn');
-  final _phoneController = TextEditingController(text: '0123456789');
+  final _fullNameController = TextEditingController(text: '');
+  final _emailController = TextEditingController(text: '');
+  final _phoneController = TextEditingController(text: '');
   final _specialRequestController = TextEditingController();
   bool isLoading = false;
 
@@ -98,12 +97,14 @@ class _BookingInputPageState extends State<BookingInputPage> {
         'phone': _phoneController.text,
         'note': _specialRequestController.text,
       },
-      'rooms': widget.bookingRooms.map((item) => {
-        'roomTypeId': item['room'].id, // Đúng: id này là roomTypeId
-        'quantity': item['quantity'],
-        'price': item['room'].price,
-        'room': item['room'].toJson(),
-      }).toList(),
+      'rooms': widget.bookingRooms
+          .map((item) => {
+                'roomTypeId': item['room'].id, // Đúng: id này là roomTypeId
+                'quantity': item['quantity'],
+                'price': item['room'].price,
+                'room': item['room'].toJson(),
+              })
+          .toList(),
       'numberOfGuests': widget.numberOfGuests,
       'numberOfRooms': widget.numberOfRooms,
       'userId': authProvider.isLoggedIn ? authProvider.userId : null,
@@ -133,17 +134,39 @@ class _BookingInputPageState extends State<BookingInputPage> {
               SliverToBoxAdapter(child: CustomHeader()),
 
               SliverToBoxAdapter(
-                child: Container(
-                  height: 200,
-                  decoration: const BoxDecoration(color: Colors.blueGrey),
-                  alignment: Alignment.center,
-                  child: const Text(
-                    'Nhập Thông Tin Đặt Phòng',
-                    style: TextStyle(
-                        fontSize: 36,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white),
-                  ),
+                child: Stack(
+                  children: [
+                    Container(
+                      height: 200,
+                      width: double.infinity,
+                      decoration: const BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage('images/resort-title-bg.jpg'),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                    Positioned.fill(
+                      child: Center(
+                        child: Text(
+                          'Nhập Thông Tin Đặt Phòng',
+                          style: TextStyle(
+                            fontSize: 36,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            shadows: [
+                              Shadow(
+                                blurRadius: 8,
+                                color: Colors.black45,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
 
@@ -242,9 +265,11 @@ class _BookingInputPageState extends State<BookingInputPage> {
                                           fontWeight: FontWeight.bold,
                                           color: Colors.blue[800])),
                                   const SizedBox(height: 8),
-                                  Text('Nhận phòng: ${DateFormat('dd/MM/yyyy').format(widget.checkInDate)}',
+                                  Text(
+                                      'Nhận phòng: ${DateFormat('dd/MM/yyyy').format(widget.checkInDate)}',
                                       style: TextStyle(fontSize: 16)),
-                                  Text('Trả phòng: ${DateFormat('dd/MM/yyyy').format(widget.checkOutDate)}',
+                                  Text(
+                                      'Trả phòng: ${DateFormat('dd/MM/yyyy').format(widget.checkOutDate)}',
                                       style: TextStyle(fontSize: 16)),
                                   const SizedBox(height: 8),
                                   Text('Tóm Tắt Giá',
@@ -300,11 +325,16 @@ class _BookingInputPageState extends State<BookingInputPage> {
                                               : null),
                                   const SizedBox(height: 16),
                                   _buildTextField(
-                                      _phoneController,
-                                      'Số Điện Thoại',
-                                      (v) => (v?.isEmpty ?? true)
-                                          ? 'Vui lòng nhập số điện thoại'
-                                          : null),
+                                      _phoneController, 'Số Điện Thoại', (v) {
+                                    if (v == null || v.trim().isEmpty) {
+                                      return 'Vui lòng nhập số điện thoại';
+                                    }
+                                    if (!RegExp(r'^\d{10}$')
+                                        .hasMatch(v.trim())) {
+                                      return 'Số điện thoại không hợp lệ';
+                                    }
+                                    return null;
+                                  }),
                                   const SizedBox(height: 24),
                                   Text('Yêu Cầu Đặc Biệt',
                                       style: TextStyle(

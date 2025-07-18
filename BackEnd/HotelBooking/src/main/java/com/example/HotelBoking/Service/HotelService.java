@@ -50,6 +50,9 @@ public class HotelService {
         dto.setDescription(h.getDescription());
         dto.setStarRating(h.getStarRating());
         dto.setCreatedAt(h.getCreatedAt());
+        dto.setLatitude(h.getLatitude());
+        dto.setLongitude(h.getLongitude());
+
         String thumbnailUrl = hotelImageRepository.findThumbnailUrlByHotelId(h.getId());
         dto.setThumbnailUrl(thumbnailUrl);
         // Lấy danh sách tất cả ảnh

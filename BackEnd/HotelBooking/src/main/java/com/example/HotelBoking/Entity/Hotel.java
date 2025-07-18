@@ -25,6 +25,23 @@ public class Hotel {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
     private BigDecimal latitude;
+
+    public BigDecimal getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(BigDecimal latitude) {
+        this.latitude = latitude;
+    }
+
+    public BigDecimal getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(BigDecimal longitude) {
+        this.longitude = longitude;
+    }
+
     private BigDecimal longitude;
 
     public Hotel(){}

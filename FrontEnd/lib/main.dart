@@ -22,7 +22,7 @@ class HotelBookingApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return AuthWrapper(
       child: MaterialApp(
-        title: 'Hotel Booking App',
+        title: 'Hotel Booking ',
         debugShowCheckedModeBanner: false,
         initialRoute: '/home',
         theme: ThemeData(

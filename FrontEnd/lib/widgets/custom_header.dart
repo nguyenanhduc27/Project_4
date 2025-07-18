@@ -25,7 +25,7 @@ class CustomHeader extends StatelessWidget {
                     SizedBox(width: 20),
                     Icon(Icons.email, size: 18, color: Colors.black),
                     SizedBox(width: 5),
-                    Text('Book@Hotale.co', style: TextStyle(fontSize: 14)),
+                    Text('BookingEase@.com', style: TextStyle(fontSize: 14)),
                   ],
                 ),
                 // Logo
@@ -39,6 +39,19 @@ class CustomHeader extends StatelessWidget {
                       image: DecorationImage(
                         image: AssetImage('images/logo-hotel-1.png'),
                         fit: BoxFit.contain,
+                      ),
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(8),
+                        onTap: () {
+                          Navigator.pushNamed(context, '/home');
+                        },
+                        child: Container(
+                          width: 80,
+                          height: 95,
+                        ),
                       ),
                     ),
                   ),
@@ -97,6 +110,26 @@ class CustomHeader extends StatelessWidget {
                               ),
                             ),
                           ),
+                          Container(
+                            width: 1,
+                            height: 24,
+                            color: Color(0xFF424242),
+                            margin: EdgeInsets.only(left: 28),
+                          ),
+                          SizedBox(width: 32),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pushNamed(context, '/signup');
+                            },
+                            child: Text(
+                              'Sign Up',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF424242),
+                              ),
+                            ),
+                          ),
                         ],
                       );
                     }
@@ -111,44 +144,101 @@ class CustomHeader extends StatelessWidget {
 
           // --- Navigation ---
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+            padding: EdgeInsets.only(left: 220, top: 20, bottom: 20),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              // children: [
-              //   Expanded(
-              //     // Co giãn phần menu
-              //     child: SingleChildScrollView(
-              //       // Phòng trường hợp menu dài
-              //       scrollDirection: Axis.horizontal,
-              //       child: Row(
-              //         children: [
-              //           TextButton(onPressed: () {}, child: Text('Home')),
-              //           SizedBox(width: 20),
-              //           TextButton(onPressed: () {}, child: Text('Pages')),
-              //           SizedBox(width: 20),
-              //           TextButton(onPressed: () {}, child: Text('Rooms')),
-              //           SizedBox(width: 20),
-              //           TextButton(
-              //               onPressed: () {}, child: Text('Reservation')),
-              //           SizedBox(width: 20),
-              //           TextButton(onPressed: () {}, child: Text('Blog')),
-              //           SizedBox(width: 20),
-              //           TextButton(onPressed: () {}, child: Text('Contact')),
-              //         ],
-              //       ),
-              //     ),
-              //   ),
-              //   ElevatedButton(
-              //     onPressed: () {},
-              //     style: ElevatedButton.styleFrom(
-              //       backgroundColor: Colors.black,
-              //       foregroundColor: Colors.white,
-              //     ),
-              //     child: Text('BOOK NOW'),
-              //   ),
-              // ],
+              children: [
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/home');
+                        },
+                        child: Text(
+                          'Home',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Color.fromARGB(255, 79, 78, 78),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 30),
+                      TextButton(
+                        onPressed: () {},
+                        child: Text(
+                          'Pages',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Color.fromARGB(255, 79, 78, 78),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 30),
+                      TextButton(
+                        onPressed: () {},
+                        child: Text(
+                          'Rooms',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Color.fromARGB(255, 79, 78, 78),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 30),
+                      TextButton(
+                        onPressed: () {},
+                        child: Text(
+                          'Reservation',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Color.fromARGB(255, 79, 78, 78),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 30),
+                      TextButton(
+                        onPressed: () {},
+                        child: Text(
+                          'Blog',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Color.fromARGB(255, 79, 78, 78),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 30),
+                      TextButton(
+                        onPressed: () {},
+                        child: Text(
+                          'Contact',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Color.fromARGB(255, 79, 78, 78),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                // Button BOOK NOW bên phải
+                ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: Text('BOOK NOW'),
+                ),
+              ],
             ),
-          )
+          ),
         ],
       ),
     );

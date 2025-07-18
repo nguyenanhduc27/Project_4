@@ -10,8 +10,8 @@ class Hotel {
   final String? thumbnailUrl;
   final List<String> imageUrls;
   final List<String>? amenities;
-  final double latitude;   // Thêm dòng này
-  final double longitude;  // Thêm dòng này
+  final double? latitude;   // Thêm dòng này
+  final double? longitude;  // Thêm dòng này
 
   Hotel({
     required this.id,
@@ -23,8 +23,8 @@ class Hotel {
     this.thumbnailUrl,
     required this.imageUrls,
     this.amenities,
-    required this.latitude,   // Thêm dòng này
-    required this.longitude,  // Thêm dòng này
+    this.latitude,   // Thêm dòng này
+    this.longitude,  // Thêm dòng này
   });
 
   factory Hotel.fromJson(Map<String, dynamic> json) {
