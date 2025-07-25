@@ -4,9 +4,12 @@ import '../models/RoomOption.dart';
 import '../widgets/custom_header.dart';
 import '../widgets/custom_footer.dart';
 import 'package:intl/intl.dart';
-import '../services/booking.dart';
+import '../services/booking_service.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class PaymentPage extends StatelessWidget {
   final Map<String, dynamic> bookingData;
@@ -30,9 +33,7 @@ class PaymentPage extends StatelessWidget {
       dataToSend['userId'] = authProvider.userId;
     }
     final hotel = bookingData['hotel'];
-    final roomOptions = (bookingData['rooms'] as List)
-        .map((e) => e)
-        .toList();
+    final roomOptions = (bookingData['rooms'] as List).map((e) => e).toList();
     final totalAmount = bookingData['totalPrice'] ?? 0;
 
     return Scaffold(
@@ -96,7 +97,8 @@ class PaymentPage extends StatelessWidget {
                       if (constraints.maxWidth > 800)
                         SizedBox(
                           width: 320,
-                          child: _buildRoomInfo(hotel, roomOptions, totalAmount),
+                          child:
+                              _buildRoomInfo(hotel, roomOptions, totalAmount),
                         ),
                       const SizedBox(width: 40),
                       Expanded(
@@ -176,7 +178,9 @@ class PaymentPage extends StatelessWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: Image.network(
-                hotel is Hotel ? hotel.thumbnailUrl ?? '' : hotel['thumbnailUrl'] ?? '',
+                hotel is Hotel
+                    ? hotel.thumbnailUrl ?? ''
+                    : hotel['thumbnailUrl'] ?? '',
                 height: 150,
                 width: double.infinity,
                 fit: BoxFit.cover,
@@ -191,7 +195,7 @@ class PaymentPage extends StatelessWidget {
             ...roomOptions.map((item) {
               Map<String, dynamic> roomData;
               int quantity = 1;
-              
+
               if (item is Map) {
                 if (item['room'] is Map<String, dynamic>) {
                   roomData = item['room'] as Map<String, dynamic>;
@@ -204,7 +208,7 @@ class PaymentPage extends StatelessWidget {
               } else {
                 return SizedBox();
               }
-              
+
               return Padding(
                 padding: const EdgeInsets.only(bottom: 12),
                 child: Column(
@@ -212,10 +216,10 @@ class PaymentPage extends StatelessWidget {
                   children: [
                     Text('${roomData['type']} x $quantity',
                         style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold)),
+                            fontSize: 16, fontWeight: FontWeight.bold)),
                     Text('Giường: ${roomData['bedInfo']}',
-                        style: TextStyle(fontSize: 14, color: Colors.grey[600])),
+                        style:
+                            TextStyle(fontSize: 14, color: Colors.grey[600])),
                     const SizedBox(height: 4),
                     Wrap(spacing: 8, children: [
                       _amenityTag(Icons.wifi, 'Wifi miễn phí'),
@@ -227,7 +231,10 @@ class PaymentPage extends StatelessWidget {
                     ]),
                     const SizedBox(height: 4),
                     Text('Giá: ${roomData['price'].toStringAsFixed(0)} VND',
-                        style: TextStyle(fontSize: 14, color: Colors.blue[800], fontWeight: FontWeight.w600)),
+                        style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.blue[800],
+                            fontWeight: FontWeight.w600)),
                   ],
                 ),
               );
@@ -239,8 +246,10 @@ class PaymentPage extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                     color: Colors.blue[800])),
             const SizedBox(height: 8),
-            Text('Nhận phòng: ${bookingData['checkIn'] ?? ''}', style: TextStyle(fontSize: 16)),
-            Text('Trả phòng: ${bookingData['checkOut'] ?? ''}', style: TextStyle(fontSize: 16)),
+            Text('Nhận phòng: ${bookingData['checkIn'] ?? ''}',
+                style: TextStyle(fontSize: 16)),
+            Text('Trả phòng: ${bookingData['checkOut'] ?? ''}',
+                style: TextStyle(fontSize: 16)),
             const SizedBox(height: 8),
             Text('Tóm Tắt Giá',
                 style: TextStyle(
@@ -281,21 +290,47 @@ class PaymentPage extends StatelessWidget {
               trailing: ElevatedButton(
                 onPressed: () async {
                   try {
-                    // Tạo bản sao của bookingData và chuyển đổi Hotel object thành JSON
                     final dataToSend = Map<String, dynamic>.from(bookingData);
                     if (dataToSend['hotel'] is Hotel) {
-                      dataToSend['hotel'] = (dataToSend['hotel'] as Hotel).toJson();
+                      dataToSend['hotel'] =
+                          (dataToSend['hotel'] as Hotel).toJson();
                     }
-                    
-                    // Đảm bảo userId được set (có thể null nếu không đăng nhập)
                     if (!dataToSend.containsKey('userId')) {
                       dataToSend['userId'] = null;
                     }
-                    
-                    await BookingService.createBooking(dataToSend);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Đặt phòng thành công!')),
+
+                    // 1. Gửi booking lên backend
+                    final bookingResponse =
+                        await BookingService.createBooking(dataToSend);
+
+                    // 2. Lấy bookingId từ response
+                    final bookingId = bookingResponse['id']; // 63
+                    final totalPrice = bookingResponse['totalPrice'];
+
+                    final amount = totalPrice.round();
+
+                    // 3. Gửi bookingId này vào API lấy link VNPay
+                    final response = await http.post(
+                      Uri.parse('http://localhost:8080/api/payment/vnpay'),
+                      headers: {'Content-Type': 'application/json'},
+                      body: jsonEncode({
+                        'bookingId': bookingId,
+                        'amount': bookingResponse['totalPrice'],
+                        'orderInfo': 'Thanh toán đơn hàng #$bookingId',
+                      }),
                     );
+
+                    if (response.statusCode == 200) {
+                      final data = jsonDecode(response.body);
+                      final paymentUrl = data['paymentUrl'];
+                      final uri = Uri.parse(paymentUrl);
+                      if (!await launchUrl(uri,
+                          mode: LaunchMode.externalApplication)) {
+                        throw 'Không thể mở link VNPay';
+                      }
+                    } else {
+                      throw 'Không lấy được link thanh toán VNPay';
+                    }
                   } catch (e) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Lỗi: $e')),

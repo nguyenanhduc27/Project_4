@@ -1,9 +1,9 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-
 class BookingService {
-  static Future<bool> createBooking(Map<String, dynamic> bookingData) async {
+  static Future<Map<String, dynamic>> createBooking(
+      Map<String, dynamic> bookingData) async {
     try {
       // Kiểm tra các trường bắt buộc
       if (bookingData['hotelId'] == null ||
@@ -15,7 +15,7 @@ class BookingService {
           (bookingData['rooms'] as List).isEmpty) {
         throw Exception('Thiếu thông tin bắt buộc!');
       }
-      
+
       final contact = bookingData['contact'];
       if (contact['fullName'] == null ||
           contact['email'] == null ||
@@ -47,12 +47,14 @@ class BookingService {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(dataToSend),
       );
-      
+
       print('Response status: ${response.statusCode}');
       print('Response body: ${response.body}');
-      
+
       if (response.statusCode == 200 || response.statusCode == 201) {
-        return true;
+        // Trả về dữ liệu JSON từ API
+        final responseData = jsonDecode(response.body);
+        return responseData;
       } else {
         throw Exception('Lỗi lưu booking: ${response.body}');
       }
